@@ -1,0 +1,35 @@
+{% extends "global/html_struct.html" %}
+{% block content %}
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Perfil</th>
+            <th class="text-right" colspan="3"></th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>{{ reg }}</td>
+                <td class="text-center">
+                    {% if perms.auth.perfiles_grupo %}
+                    <a href="{% url 'perfil_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.auth.actualizar_perfiles_grupo %}
+                    <a href="{% url 'perfil_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.auth.eliminar_perfiles_grupo %}
+                    <a href="{% url 'perfil_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

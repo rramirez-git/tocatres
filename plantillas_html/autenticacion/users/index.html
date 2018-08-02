@@ -1,0 +1,34 @@
+{% extends "global/html_struct.html" %}
+
+{% block content %}
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>E-Mail</th>
+            <th>Activo</th>
+            <th>Es Staff</th>
+            <th>Es Super Usuario</th>
+            <th>Fecha de Creación</th>
+            <th>Último Ingreso</th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>{{ reg.username }}</td>
+                <td>{{ reg.get_full_name }}</td>
+                <td>{{ reg.email }}</td>
+                <td><input type="checkbox" disabled="disabled" {% if reg.is_active %}checked="checked"{% endif %} /></td>
+                <td><input type="checkbox" disabled="disabled" {% if reg.is_staff %}checked="checked"{% endif %} /></td>
+                <td><input type="checkbox" disabled="disabled" {% if reg.is_superuser %}checked="checked"{% endif %} /></td>
+                <td>{{ reg.date_joined }}</td>
+                <td>{{ reg.last_login }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

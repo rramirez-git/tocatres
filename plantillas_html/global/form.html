@@ -1,0 +1,29 @@
+{% extends "global/html_struct.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+        <form method="post" autocomplete="off" enctype="multipart/form-data" id="main-form" class="d-none" action="{% if action %}{% url action %}{% endif %}">
+            {% csrf_token %}
+            {{ frm | crispy }}
+            <button type="submit" class="btn btn-outline-primary" id="btn-save" >Guardar</button>
+        </form>
+    </div>
+</div>
+{% if True == read_only %}
+    <script type="text/javascript">
+        $( document ).ready( () => {
+            $( "#main-form input, #main-form select, #main-form textarea" ).attr( 'readonly', true );
+            $( "#main-form input[type='checkbox'], #main-form input[type='file']" ).attr( 'disabled', true );
+            $( "#main-form input[type='file']" ).hide();
+            $( "#btn-save" ).hide();
+        } )
+    </script>
+{% endif %}
+<script type="text/javascript">
+    $( document ).ready( () => {
+        $( "#main-form" ).removeClass( 'd-none' );
+    } )
+</script>
+{% endblock %}

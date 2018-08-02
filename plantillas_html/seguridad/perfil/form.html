@@ -1,0 +1,52 @@
+{% extends "global/html_struct.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+        <form method="post" autocomplete="off" enctype="multipart/form-data" id="main-form" class="d-none" action="{% if action %}{% url action %}{% endif %}">
+            {% csrf_token %}
+            
+            <div id="div_id_nombre" class="form-group">
+                <label for="id_nombre" class="col-form-label requiredField">Nombre<span class="asteriskField">*</span></label>
+                <div class="">
+                    <input type="text" name="nombre" maxlength="100" class="textinput textInput form-control" required="required" id="id_nombre" value="{{ gpo.name }}" />
+                </div>
+            </div>
+
+            <p class="h4">Permisos del Perfil</p>
+
+            <table class="table table-sm">
+                <tbody id="data">
+                    {% for p in permisos %}
+                        <tr>
+                            <td>
+                                <label for="permiso_{{ p.pk }}">
+                                    <input type="checkbox" name="permisos" value="{{ p.pk }}" id="permiso_{{ p.pk }}" {% if p in permisos_en_perfil %}checked="checked"{% endif %} />
+                                    {{ p.depth_name | safe }}
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn btn-outline-primary" id="btn-save" >Guardar</button>
+        </form>
+    </div>
+</div>
+{% if True == read_only %}
+    <script type="text/javascript">
+        $( document ).ready( () => {
+            $( "#main-form input, #main-form select, #main-form textarea" ).attr( 'readonly', true );
+            $( "#main-form input[type='checkbox']" ).attr( 'disabled', true );
+            $( "#btn-save" ).hide();
+        } )
+    </script>
+{% endif %}
+<script type="text/javascript">
+    $( document ).ready( () => {
+        $( "#main-form" ).removeClass( 'd-none' );
+    } )
+</script>
+{% endblock %}

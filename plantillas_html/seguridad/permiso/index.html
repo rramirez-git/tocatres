@@ -1,0 +1,44 @@
+{% extends "global/html_struct.html" %}
+{% load i18n %}
+{% block content %}
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>Permiso</th>
+            <th>Vista</th>
+            <th>Código</th>
+            <th>Tipo de Contenido</th>
+            <th>Es Operación</th>
+            <th class="text-right" colspan="3"></th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr class="{% if reg.vista != 'vw' %}table-primary{% endif %}">
+                <td>{{ reg.depth_name | safe }}</td>
+                <td>{{ reg.vista }}</td>
+                <td>{{ reg.codename }}</td>
+                <td>{% language 'en' %}{{ reg.content_type }}{% endlanguage %}</td>
+                <td>{% if reg.es_operacion %}Sí{% else %}No{% endif %}</td>
+                <td class="text-center">
+                    {% if perms.seguridad.permisos_permiso %}
+                    <a href="{% url 'permiso_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.seguridad.actualizar_permisos_permiso %}
+                    <a href="{% url 'permiso_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.seguridad.eliminar_permisos_permiso %}
+                    <a href="{% url 'permiso_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

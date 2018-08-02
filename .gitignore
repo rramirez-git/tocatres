@@ -116,3 +116,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+*.sqlite3
+manage.py
+media/
+*/migrations/
+tocatres/main_settings.py

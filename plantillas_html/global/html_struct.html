@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Lang" content="es-mx" />
+		<meta name="author" content="Rubén Ramírez Gómez RAGR8602025L7 rramirez@rramirez.com" />
+		<meta http-equiv="Reply-to" content="rramirez@rramirez.com" />
+		<meta name="creation-date" content="09/06/2012" />
+		<meta name="revisit-after" content="15 days" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		<title>..:: TocaTres ::..</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<link rel="icon" href="{% static "img/favicon.png" %}" type="image/png" />
+		<link rel="stylesheet" href="{% static "css/styles.css" %}" />
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js" integrity="sha384-feJI7QwhOS+hwpX2zkaeJQjeiwlhOP+SdQDqhgvvo1DsjtiSQByFdThsxO669S2D" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js" integrity="sha256-+JMHsXRyeTsws/tzbIh5YHQxRdKCuNjmvNcTFtY6DLc=" crossorigin="anonymous"></script>
+		<script defer src="https://use.fontawesome.com/releases/v5.2.0/js/all.js" integrity="sha384-4oV5EgaV02iISL2ban6c/RmotsABqE4yZxZLcYMAdG7FAPsyHYAPpywE9PJo+Khy" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+	</head>
+	<body>
+            
+        {% if menu_main %}
+            {% include "global/menu_main.html" %}
+		{% endif %}
+
+        <div class="container">
+
+			{% if toolbar %}
+				{% include "global/toolbar.html" %}
+			{% endif %}
+
+            {% if titulo %}
+                <h1>
+					{{ titulo }}
+					
+					{% if titulo_descripcion %}
+						<small class="text-muted">
+							{{ titulo_descripcion }}
+						</small>
+					{% endif %}
+
+				</h1>
+			{% endif %}
+			
+			{% block extrabefore %}
+			{% endblock%}
+
+			{% block content %}
+			{% endblock %}
+
+			{% block extraafter %}
+			{% endblock%}
+            
+        </div>
+        
+        {% if True == footer %}
+            {% include "global/footer.html" %}
+        {% endif %}
+
+    </body>
+</html>

@@ -1,0 +1,25 @@
+<!-- toolbar.html (Open) -->
+<div class="btn-toolbar float-right" role="toolbar">
+        <div class="btn-group" role="group">
+        {% for item in toolbar %}
+            {% if 'link' == item.type %}
+                <a href="{% url item.view %}" class="btn btn-outline-secondary">
+                    {{ item.label | safe }}
+                </a>
+            {% elif 'link_pk' == item.type %}
+                <a href="{% url item.view pk=item.pk %}" class="btn btn-outline-secondary">
+                    {{ item.label | safe }}
+                </a>
+            {% elif 'button' == item.type %}
+                <button type="button" class="btn btn-outline-secondary" onclick="{{ item.onclick }}">
+                    {{ item.label | safe }}
+                </button>
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    Tipo de item no implementado: {{ item }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<!-- toolbar.html (Close) -->
