@@ -5,7 +5,15 @@
 {% if arbol %}
     <h3>Árbol de Descendencia</h3>
     {% for p in arbol %}
-        {{ p.depth_name | safe }}<br />
+        {{ p.depth_name | safe }}
+        {% if p.cliente and p.vendedor %}
+            - cliente / vendedor
+        {% elif p.cliente %}
+            - cliente
+        {% elif p.vendedor %}
+            - vendedor
+        {% endif %}
+        <br />
     {% endfor %}
 {% endif%}
 

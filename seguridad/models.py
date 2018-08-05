@@ -67,7 +67,7 @@ class Usr( User ):
     def __str__( self ):
         return self.get_full_name()
     def hijos( self ):
-        return Usr.objects.filter( depende_de__pk = self.pk )
+        return Usr.objects.filter( depende_de = self )
     def depth( self ):
         if self.depende_de is None:
             return 0

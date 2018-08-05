@@ -4,6 +4,7 @@
 <table class="table table-striped table-sm">
     <thead>
         <tr>
+            <th>Vendedor</th>
             <th></th>
             <th>Usuario</th>
             <th>Nombre</th>
@@ -16,25 +17,26 @@
     <tbody id="data-tbl">
         {% for reg in data %}
             <tr>
+                <td>{{ reg.compra_a }}</td>
                 <td>{% if reg.fotografia %}<img class="rounded-circle" src="{{ MEDIA_URL }}{{ reg.fotografia }}" height="40" width="40" />{% endif %}</td>
                 <td>{{ reg.usuario }}</td>
-                <td>{{ reg.depth_name | safe }}</td>
+                <td>{{ reg.get_full_name }}</td>
                 <td>{{ reg.email }}</td>
                 <td>{% if reg.celular %}{{ reg.celular }}{% endif %}</td>
                 <td>{% if reg.telefono %}{{ reg.telefono }}{% endif %}</td>
                 <td class="text-center">
-                    {% if perms.seguridad.usuarios_usuario %}
-                    <a href="{% url 'usuario_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% if perms.buyersandsellers.clientes_usuario %}
+                    <a href="{% url 'cliente_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
                     {% endif %}
                 </td>
                 <td class="text-center">
-                    {% if perms.seguridad.actualizar_usuarios_usuario %}
-                    <a href="{% url 'usuario_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% if perms.buyersandsellers.actualizar_clientes_usuario %}
+                    <a href="{% url 'cliente_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
                     {% endif %}
                 </td>
                 <td class="text-center">
-                    {% if perms.seguridad.eliminar_usuarios_usuario %}
-                    <a href="{% url 'usuario_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% if perms.buyersandsellers.eliminar_clientes_usuario %}
+                    <a href="{% url 'cliente_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
                     {% endif %}
                 </td>
             </tr>

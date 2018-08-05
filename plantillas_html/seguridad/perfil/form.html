@@ -39,7 +39,8 @@
     <script type="text/javascript">
         $( document ).ready( () => {
             $( "#main-form input, #main-form select, #main-form textarea" ).attr( 'readonly', true );
-            $( "#main-form input[type='checkbox']" ).attr( 'disabled', true );
+            $( "#main-form input[type='checkbox'], #main-form input[type='file'], #main-form select" ).attr( 'disabled', true );
+            $( "#main-form input[type='file']" ).hide();
             $( "#btn-save" ).hide();
         } )
     </script>

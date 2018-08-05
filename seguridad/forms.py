@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib import auth
+
 from .models import *
 
 class RegPermiso( forms.ModelForm ):
@@ -40,3 +42,16 @@ class AccUsuario( forms.Form ):
             'placeholder' : "Contraseña" 
             } )
     )
+    def clean(self):
+        username = self.cleaned_data.get( 'usr' )
+        password = self.cleaned_data.get( 'pwd' )
+        user = auth.authenticate( username = username, password = password)
+        if not user or not user.is_active:
+            raise forms.ValidationError( "El usuario o la contraseña no son válidos." )
+        return self.cleaned_data
+
+    def login(self, request):
+        username = self.cleaned_data.get( 'usr' )
+        password = self.cleaned_data.get( 'pwd' )
+        user = auth.authenticate( username = username, password = password )
+        return user
