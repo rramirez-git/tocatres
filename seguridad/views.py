@@ -23,9 +23,7 @@ def index( request ):
 def login( request ):
     frm = AccUsuario( request.POST or None )
     if frm.is_valid() and 'POST' == request.method:
-        usr = frm.cleaned_data.get( 'usr' )
-        pwd = frm.cleaned_data.get( 'pwd' )
-        user = auth.authenticate( username = usr, password = pwd )
+        user = frm.login( request )
         if user is not None and user.is_active:
             auth.login( request, user )
             usuario = Usr.objects.get( id = user.pk )

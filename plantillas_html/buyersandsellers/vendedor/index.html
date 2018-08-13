@@ -23,18 +23,18 @@
                 <td>{% if reg.celular %}{{ reg.celular }}{% endif %}</td>
                 <td>{% if reg.telefono %}{{ reg.telefono }}{% endif %}</td>
                 <td class="text-center">
-                    {% if perms.seguridad.usuarios_usuario %}
-                    <a href="{% url 'usuario_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% if perms.buyersandsellers.vendedores_usuario %}
+                    <a href="{% url 'vendedor_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
                     {% endif %}
                 </td>
                 <td class="text-center">
-                    {% if perms.seguridad.actualizar_usuarios_usuario %}
-                    <a href="{% url 'usuario_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% if perms.buyersandsellers.actualizar_vendedores_usuario %}
+                    <a href="{% url 'vendedor_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
                     {% endif %}
                 </td>
                 <td class="text-center">
-                    {% if perms.seguridad.eliminar_usuarios_usuario %}
-                    <a href="{% url 'usuario_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% if perms.buyersandsellers.eliminar_vendedores_usuario %}
+                    <a href="{% url 'vendedor_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
                     {% endif %}
                 </td>
             </tr>

@@ -47,10 +47,10 @@ def new( request ):
     frm = RegUsuario( request.POST or None )
     return render( request, 'global/form.html', {
         'menu_main' : Usr.objects.filter( id = request.user.pk )[ 0 ].main_menu_struct(),
-            'footer' : True,
-            'titulo' : 'Usuarios',
-            'titulo_descripcion' : 'Nuevo',
-            'frm' : frm
+        'footer' : True,
+        'titulo' : 'Usuarios',
+        'titulo_descripcion' : 'Nuevo',
+        'frm' : frm
     } )
 
 @valida_acceso( [ 'usr.usuarios_usuario' ] )
