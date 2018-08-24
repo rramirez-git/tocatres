@@ -74,3 +74,33 @@ footer {
     text-align: left;
     width: 100%;
 }
+
+/* Estado de Cuenta */
+
+.movimiento {
+    border-bottom: 1px solid silver;
+    padding: 15px;
+}
+
+.movimiento:last-child {
+    border-bottom: none;
+}
+
+.movimiento .concepto {
+    height: 25px;
+    overflow: hidden;
+}
+
+/* Impresion */
+
+@media only print {
+
+    #main-toolbar {
+        display: none;
+    }
+
+    #data-tbl tr a.btn {
+        display: none;
+    }
+
+}

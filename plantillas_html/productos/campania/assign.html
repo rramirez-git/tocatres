@@ -1,0 +1,93 @@
+{% extends "global/html_struct.html" %}
+
+{% block extrabefore %}
+
+{% if msg %}
+
+<div class="alert alert-primary" role="alert">
+    {{ msg }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+<form method="post" autocomplete="off" enctype="multipart/form-data" id="main-form" action="{% if action %}{% url action %}{% endif %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="campaign">Campaña</label>
+        <select class="form-control" id="campaign" name="campaign">
+            {% for c in campaigns %}
+                <option value="{{ c.pk }}">{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="eliminar_anteriores">
+            <input type="checkbox" value="yes" name="eliminar_anteriores" id="eliminar_anteriores" /> 
+            Eliminar clientes asignados anteriormente
+        </label>
+    </div>
+    <hr />
+    {% if data.misclientes %}
+        <p class="lead">
+            Asignar a mis clientes
+            <button onclick="App.checkInputIn( 'mis-clientes' )" type="button" class="btn btn-outline-secondary"><i class="far fa-check-square"></i> Marcar Todos</button>
+            <button onclick="App.uncheckInputIn( 'mis-clientes' )" type="button" class="btn btn-outline-secondary"><i class="far fa-square"></i> Desmarcar Todos</button>
+        </p>
+        <div class="row" id="mis-clientes">
+            {% for u in data.misclientes %}
+                <div class="col-sm-3">
+                    <label>
+                        <input type="checkbox" name="misclientes" value="{{ u.pk }}" /> 
+                        {{ u.get_full_name }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        <hr />
+    {% endif %}
+    {% if data.misvendedores %}
+        <p class="lead">
+            Asignar a clientes de mis vendedores
+            <button onclick="App.checkInputIn( 'mis-vendedores' )" type="button" class="btn btn-outline-secondary"><i class="far fa-check-square"></i> Marcar Todos</button>
+            <button onclick="App.uncheckInputIn( 'mis-vendedores' )" type="button" class="btn btn-outline-secondary"><i class="far fa-square"></i> Desmarcar Todos</button>
+        </p>
+        <div class="row" id="mis-vendedores">
+            {% for u in data.misvendedores %}
+                <div class="col-sm-3">
+                    <label>
+                        <input type="checkbox" name="misvendedores" value="{{ u.pk }}" /> 
+                        {{ u.get_full_name }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        <hr />
+    {% endif %}
+    {% if data.clientes %}
+        <p class="lead">
+            Asignar a clienttes específicos
+            <button onclick="App.checkInputIn( 'clientes' )" type="button" class="btn btn-outline-secondary"><i class="far fa-check-square"></i> Marcar Todos</button>
+            <button onclick="App.uncheckInputIn( 'clientes' )" type="button" class="btn btn-outline-secondary"><i class="far fa-square"></i> Desmarcar Todos</button>
+        </p>
+        <div class="row" id="clientes">
+            {% for u in data.clientes %}
+                <div class="col-sm-3">
+                    <label>
+                        <input type="checkbox" name="clientes" value="{{ u.pk }}" /> 
+                        {{ u.get_full_name }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        <hr />
+    {% endif  %}
+    <button type="submit" class="btn btn-outline-primary">Asignar</button>
+</form>
+
+{% endblock %}

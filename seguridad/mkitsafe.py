@@ -6,7 +6,9 @@ from django.urls import reverse
 from .models import Permiso
 from tocatres.utils import *
 
-def valida_acceso( permisos = None, url_error = 'seguridad_inicio', url_autenticacion = 'seguridad_login' ):
+def valida_acceso( permisos = None ):
+    url_error = 'seguridad_inicio'
+    url_autenticacion = 'seguridad_login'
     """ 
     Función decoradora que verifica si un usuario esta logeado en el sistema y si tiene ALGUNO de los permisos pasados como parámetro o bien alguno de los permisos hijo 
     
@@ -26,7 +28,6 @@ def valida_acceso( permisos = None, url_error = 'seguridad_inicio', url_autentic
 
         def validacion( *args, **kwargs ):
             """ Funcion de tercer nivel de la función decoradora valida_acceso """
-            
             usuario = args[ 0 ].user
             if not usuario.is_authenticated:
                 print_error( "Vista {} negada por autenticación".format( vista.__name__ ), "Exec Info" )
@@ -49,7 +50,6 @@ def valida_acceso( permisos = None, url_error = 'seguridad_inicio', url_autentic
                     return vista( *args, **kwargs )
             print_error( "Vista {} negada por permisos {}".format( vista.__name__, permisos ), "Exec Info" )
             return HttpResponseRedirect( reverse( url_error ) )
-
         return validacion
 
     return _valida_acceso

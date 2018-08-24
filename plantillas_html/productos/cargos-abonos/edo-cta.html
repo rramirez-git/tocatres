@@ -1,0 +1,53 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block content %}
+
+<p class="lead">
+    Saldo Acual: 
+    {% language 'en' %}
+        ${{ saldo | intcomma }}
+    {% endlanguage %}
+</p>
+
+{% for mov in movs %}
+    <div class="movimiento">
+        <div class="clearfix">
+            <div class="float-left text-muted">{{ mov.fecha }}</div>
+            <div class="float-right">
+                {% language 'en' %}
+                    {% if mov.cargo %}
+                        <span class="text-primary">$ - {{ mov.monto | intcomma }} </span>
+                    {% else %}
+                        $ {{ mov.monto | intcomma }}
+                    {% endif %}
+                {% endlanguage %}
+            </div>
+        </div>
+        <div class="concepto">
+            {{ mov }}
+        </div>
+        {% if mov.actualizable %}
+            {% if mov.cargo %}<!-- url 'cargos_abonos_eliminar_cargo' pk=reg.pk -->
+                {% if perms.productos.remover_abono_abono %}
+                    <div class="col-sm-3 offset-sm-9">
+                        <a href="{% url 'cargos_abonos_eliminar_abono' pk=mov.pk pkcte=cte.pk %}" class="btn btn-outline-secondary btn-block" title="Eliminar">
+                            <i class="far fa-trash-alt"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if perms.productos.remover_cargo_cargo %}
+                    <div class="col-sm-3 offset-sm-9">
+                        <a href="{% url 'cargos_abonos_eliminar_cargo' pk=mov.pk pkcte=cte.pk %}" class="btn btn-outline-secondary btn-block" title="Eliminar">
+                            <i class="far fa-trash-alt"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+{% endfor %}
+
+{% endblock %}

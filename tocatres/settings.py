@@ -18,20 +18,16 @@ from .main_settings import *
 mimetypes.add_type( 'text/css', '.css', True )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname( os.path.dirname( os.path.abspath( __file__ ) ) )
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = MAIN_ALLOWED_HOSTS()
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = MAIN_SECRET_KEY()
 
 ALLOWED_HOSTS = MAIN_ALLOWED_HOSTS()
-
 
 # Application definition
 
@@ -44,10 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'crispy_forms',
+    'django.contrib.humanize',
 
     'seguridad',
     'autenticacion',
     'buyersandsellers',
+    'productos',
 ]
 
 MIDDLEWARE = [
@@ -80,7 +78,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'tocatres.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -126,12 +123,27 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
-STATICFILES_DIRS = [ BASE_DIR + '/assets', os.path.join(BASE_DIR, "static") ] # arnchivos estatics dentro del proyecto
-# STATIC_ROOT = '/home/hexpywbw/public_html/dev_work/preprod/tocatres/static' # archivos estaticos dentro del servidor de desarrollo
-# MEDIA_ROOT = '/home/hexpywbw/public_html/dev_work/preprod/tocatres/media'
-STATIC_ROOT = r'C:\django_apps\tocatres\tocatres\tocatres\static' # archivos estaticos dentro del servidor de desarrollo
-MEDIA_ROOT = r'C:\django_apps\tocatres\tocatres\tocatres\media'
+STATICFILES_DIRS = [ os.path.join( BASE_DIR, "static") ]
+STATIC_ROOT = os.path.join( '/home/tocatres/public_html/', 'static/' )
+MEDIA_ROOT = os.path.join( '/home/tocatres/public_html/', 'media/' )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 SESSION_SAVE_EVERY_REQUEST = True
+
+UPLOADER_KEY = '15c3cbda25ff5c127489191b9f198807803ced43'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
+if False == DEBUG:
+    UPLOADER_URL = 'http://uploader.tocatres.com/uploader.php'
+    UPLOADER_SITE = 'tocatres'
+    STATIC_ROOT = os.path.join( '/home/tocatres/public_html/', 'static/' )
+    MEDIA_ROOT = os.path.join( '/home/tocatres/public_html/', 'media/' )
+else:
+    # UPLOADER_URL = 'http://dev.unam_dba.com/uploader.php'
+    # UPLOADER_SITE = 'tocatres_dev'
+    UPLOADER_URL = 'https://imagilex.com.mx/uploader.php'
+    UPLOADER_SITE = 'tocatres_qa'
+    STATIC_ROOT = os.path.join( BASE_DIR, 'files/static/' )
+    MEDIA_ROOT = os.path.join( BASE_DIR, 'files/media/' )

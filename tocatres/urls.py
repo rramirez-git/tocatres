@@ -17,18 +17,22 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from seguridad import views
 from seguridad import vw_permiso, vw_perfil, vw_usuario
 from autenticacion import vw_perms, vw_users
-from buyersandsellers import vw_cliente, vw_vendedor
+from buyersandsellers import vw_cliente, vw_vendedor, vw_gerente
+from productos import vw_producto, vw_campania, vw_cargos_abonos
 
 urlpatterns = [
     path( 'admin/', admin.site.urls ),
 
-    path( 'logout/',        views.logout,   name = 'seguridad_logout' ),
-    path( 'my-dashboard/',  views.index,    name = 'seguridad_inicio' ),
-    path( '',               views.login,    name = 'seguridad_login' ),
+    path( 'elemento-no-encontrado/',     views.item_not_found,       name = 'seguridad_item_no_encontrado' ),
+    path( 'elemento-con-relaciones/',    views.item_with_relations,  name = 'seguridad_item_con_relaciones' ),
+    path( 'logout/',                    views.logout,               name = 'seguridad_logout' ),
+    path( 'my-dashboard/',              views.index,                name = 'seguridad_inicio' ),
+    path( '',                           views.login,                name = 'seguridad_login' ),
 
     path( 'permisos/actualizar/<pk>/',  vw_permiso.update,  name = "permiso_actualizar" ),
     path( 'permisos/eliminar/<pk>/',    vw_permiso.delete,  name = "permiso_eliminar" ),
@@ -50,6 +54,12 @@ urlpatterns = [
     path( 'usuarios/',                  vw_usuario.index,   name = "usuario_inicio" ),
     path( 'users/',                     vw_users.index,     name = "users_inicio" ),
 
+    path( 'gerentes/actualizar/<pk>/',  vw_gerente.update,  name = 'gerente_actualizar' ),
+    path( 'gerentes/eliminar/<pk>/',    vw_gerente.delete,  name = 'gerente_eliminar' ),
+    path( 'gerentes/nuevo/',            vw_gerente.new,     name = 'gerente_nuevo' ),
+    path( 'gerentes/<pk>/',             vw_gerente.see,     name = 'gerente_ver' ),
+    path( 'gerentes/',                  vw_gerente.index,   name = 'gerente_inicio' ),
+
     path( 'vendedores/actualizar/<pk>/',    vw_vendedor.update, name = 'vendedor_actualizar' ),
     path( 'vendedores/eliminar/<pk>/',      vw_vendedor.delete, name = 'vendedor_eliminar' ),
     path( 'vendedores/nuevo/',              vw_vendedor.new,    name = 'vendedor_nuevo' ),
@@ -61,5 +71,33 @@ urlpatterns = [
     path( 'clientes/nuevo/',            vw_cliente.new,     name = 'cliente_nuevo' ),
     path( 'clientes/<pk>/',             vw_cliente.see,     name = 'cliente_ver' ),
     path( 'clientes/',                  vw_cliente.index,   name = 'cliente_inicio' ),
+
+    path( 'productos/actualizar/<pk>/', vw_producto.update, name = 'producto_actualizar' ),
+    path( 'productos/eliminar/<pk>/',   vw_producto.delete, name = 'producto_eliminar' ),
+    path( 'productos/nuevo/',           vw_producto.new,    name = 'producto_nuevo' ),
+    path( 'productos/<pk>/',            vw_producto.see,    name = 'producto_ver' ),
+    path( 'productos/',                 vw_producto.index,  name = 'producto_inicio' ),
+
+    path( 'campanias/asignar/',         vw_campania.assign,     name = 'campaña_asignar' ),
+    path( 'campanias/actualizar/<pk>/', vw_campania.update,     name = 'campaña_actualizar' ),
+    path( 'campanias/eliminar/<pk>/',   vw_campania.delete,     name = 'campaña_eliminar' ),
+    path( 'campanias/nuevo/',           vw_campania.new,        name = 'campaña_nuevo' ),
+    path( 'campanias/<pk>/',            vw_campania.see,        name = 'campaña_ver' ),
+    path( 'campanias/',                 vw_campania.index,      name = 'campaña_inicio' ),
+
+    path( 'novedades/<pk>/<mp>/',       vw_producto.detalle,    name = "campaña_novedades_producto" ),
+    path( 'novedades/',                 vw_campania.novedades,  name = 'campaña_novedades' ),
+
+    path( 'movimientos/<pk>/',          vw_cargos_abonos.account,   name = 'cargos_abonos_edocta' ),
+    path( 'movimientos/',               vw_cargos_abonos.index,     name = 'cargos_abonos_inicio' ),
+    path( 'movimientos/ventas/<pk>/',   vw_cargos_abonos.getcargos, name = 'cargos_abonos_get_cargos' ),
+
+    path( 'ventas/eliminar/<pk>/<pkcte>/',  vw_cargos_abonos.delete_cargo,  name = 'cargos_abonos_eliminar_cargo' ),
+    path( 'pagos/eliminar/<pk>/<pkcte>/',  vw_cargos_abonos.delete_abono,  name = 'cargos_abonos_eliminar_abono' ),
+
+    path( 'tu-saldo/', vw_cargos_abonos.mi_saldo,   name = 'mi_saldo' ),
     
-] + static( settings.MEDIA_URL, document_root = settings.MEDIA_ROOT )
+]
+
+urlpatterns += static( settings.MEDIA_URL, document_root = settings.MEDIA_ROOT )
+urlpatterns += staticfiles_urlpatterns()

@@ -6,12 +6,25 @@ from .models import *
 class RegPermiso( forms.ModelForm ):
     class Meta:
         model = Permiso
-        fields = [ 'nombre', 'permiso_padre', 'vista', 'posicion', 'es_operacion', 'content_type', 'descripcion' ]
+        fields = [ 'nombre', 'mostrar_como', 'permiso_padre', 'vista', 'posicion', 'es_operacion', 'content_type', 'descripcion' ]
 
 class RegUsuario( forms.ModelForm ):
     class Meta:
         model = Usr
-        fields = [ 'usuario', 'contraseña', 'is_active', 'is_superuser', 'first_name', 'last_name', 'email', 'telefono', 'celular', 'fotografia', 'groups', 'depende_de' ]
+        fields = [ 
+            'usuario', 
+            'contraseña', 
+            'is_active', 
+            'is_superuser', 
+            'first_name', 
+            'last_name', 
+            'email', 
+            'telefono', 
+            'celular', 
+            'fotografia', 
+            'groups', 
+            'depende_de' 
+        ]
         labels = {
             'email' : 'E-Mail',
             'groups' : 'Perfiles'
@@ -20,6 +33,10 @@ class RegUsuario( forms.ModelForm ):
             'groups' : '',
             'is_active' : '',
             'is_superuser' : ''
+        }
+        widgets = {
+            'telefono' : forms.TextInput( attrs={ 'type' : 'tel' } ),
+            'celular' : forms.TextInput( attrs={ 'type' : 'tel' } )
         }
 
 class AccUsuario( forms.Form ):

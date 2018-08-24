@@ -1,0 +1,55 @@
+{% extends "global/html_struct.html" %}
+{% block content %}
+
+<table class="table table-striped table-sm table-responsive-md">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Gerente</th>
+            <th>E-Mail</th>
+            <th>Celular</th>
+            <th>Teléfono</th>
+            <th class="text-right" colspan="3"></th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>{% if reg.fotografia %}<img class="rounded-circle" src="{{ MEDIA_URL }}{{ reg.fotografia }}" height="40" width="40" />{% endif %}</td>
+                <td>{{ reg }}</td>
+                <td>
+                    {% if reg.email %}
+                    <a href="mailto:{{ reg.email }}">
+                        {{ reg.email }}
+                    </a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if reg.celular %}
+                    <a href="https://api.whatsapp.com/send?phone=52{{ reg.celular }}" target="_blank">
+                        {{ reg.celular }}
+                    </a>
+                    {% endif %}
+                </td>
+                <td>{% if reg.telefono %}{{ reg.telefono }}{% endif %}</td>
+                <td class="text-center">
+                    {% if perms.buyersandsellers.gerentes_usuario %}
+                    <a href="{% url 'gerente_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.buyersandsellers.actualizar_gerentes_usuario %}
+                    <a href="{% url 'gerente_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.buyersandsellers.eliminar_gerentes_usuario %}
+                    <a href="{% url 'gerente_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

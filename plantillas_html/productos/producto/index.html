@@ -1,0 +1,54 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block content %}
+
+<table class="table table-striped table-sm table-responsive-md">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>SKU</th>
+            <th>Marca</th>
+            <th>Categoría</th>
+            {% if perms.productos.administrar_precios_producto %}
+                <th>Precio de Compra</th>
+                <th>Precio de Venta</th>
+            {% endif %}
+            <th class="text-right" colspan="3"></th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>{{ reg.nombre }}</td>
+                <td>{{ reg.sku }}</td>
+                <td>{{ reg.marca }}</td>
+                <td>{{ reg.categoria }}</td>
+                {% if perms.productos.administrar_precios_producto %}
+                    {% language 'en' %}
+                    <td>$ {{ reg.precio_de_compra | intcomma }}</td>
+                    <td>$ {{ reg.precio_de_venta | intcomma }}</td>
+                    {% endlanguage %}
+                {% endif %}
+                <td class="text-center">
+                    {% if perms.productos.administrar_productos_producto %}
+                    <a href="{% url 'producto_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.productos.actualizar_productos_producto %}
+                    <a href="{% url 'producto_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.productos.eliminar_productos_producto %}
+                    <a href="{% url 'producto_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

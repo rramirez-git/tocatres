@@ -8,15 +8,18 @@ from tocatres.utils import *
 class Permiso( Permission ):
     idpermiso = models.AutoField( primary_key = True )
     nombre = models.CharField( blank = False, max_length = 100 )
+    mostrar_como = models.CharField( blank = False, max_length = 100 )
     descripcion = models.TextField()
     vista = models.CharField( max_length = 100, null = True )
     permiso_padre = models.ForeignKey( 'self', on_delete = models.CASCADE, related_name = '+', blank = True, null = True )
     es_operacion = models.BooleanField( default = False )
     posicion = models.PositiveSmallIntegerField( default = 0 )
     def __unicode__( self ):
-        return self.nombre
+        if self.nombre.strip().lower() == self.mostrar_como.strip().lower():
+            return self.nombre
+        return "{} ({})".format( self.nombre, self.mostrar_como )
     def __str__( self ):
-        return self.nombre
+        return self.__unicode__()
     def hijos( self ):
         objs = Permiso.objects.filter( permiso_padre__pk = self.pk ).order_by( 'posicion' )
         return objs
@@ -58,8 +61,8 @@ class Usr( User ):
     idusuario = models.AutoField( primary_key = True )
     usuario = models.CharField( blank = False, unique = True, max_length = 50 )
     contraseña = models.CharField( blank = False, max_length = 250 )
-    telefono = models.CharField( max_length = 15, blank = True, null = True )
-    celular = models.CharField( max_length = 15, blank = True, null = True )
+    telefono = models.CharField( max_length = 10, blank = True, null = True )
+    celular = models.CharField( max_length = 10, blank = True, null = True )
     fotografia = models.ImageField( blank = True, null = True, upload_to = 'usuarios' )
     depende_de = models.ForeignKey( 'self', on_delete = models.CASCADE, related_name = '+', blank = True, null = True )
     def __unicode__( self ):
@@ -108,6 +111,13 @@ class Usr( User ):
                 item = { 'permiso' : rp, 'items' : items, 'items_qty' : len(items) }
                 mm.append( item )
         return mm
-
+    def __gt__( self, usr2 ):
+        return self.__str__() > usr2.__str__()
+    def __ge__( self, usr2 ):
+        return self.__str__() >= usr2.__str__()
+    def __lt__( self, usr2 ):
+        return self.__str__() < usr2.__str__()
+    def __le__( self, usr2 ):
+        return self.__str__() <= usr2.__str__()
 
 

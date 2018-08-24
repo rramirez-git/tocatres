@@ -5,14 +5,13 @@
 {% if arbol %}
     <h3>Árbol de Descendencia</h3>
     {% for p in arbol %}
-        {{ p.depth_name | safe }}
-        {% if p.cliente and p.vendedor %}
-            - cliente / vendedor
-        {% elif p.cliente %}
-            - cliente
-        {% elif p.vendedor %}
-            - vendedor
+        {% if p.cliente %}
+            <span class="text-success"><i class="fas fa-user"></i></span>
         {% endif %}
+        {% if p.vendedor %}
+            <span class="text-primary"><i class="fas fa-user-tie"></i></span>
+        {% endif %}
+        {{ p.depth_name | safe }}
         <br />
     {% endfor %}
 {% endif%}

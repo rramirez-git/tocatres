@@ -2,6 +2,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group, User
+from django.db.models import ProtectedError
+from django.conf import settings
+from random import randint
+from os.path import isfile
+from os import remove
+
+from operator import attrgetter
 
 from seguridad.mkitsafe import *
 from seguridad.models import Usr
@@ -15,11 +22,20 @@ def index( request ):
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'cliente.agregar_clientes_usuario' ):
         toolbar.append( { 'type' : 'link', 'view' : 'cliente_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
-    if usuario.is_superuser:
-        data = Cliente.objects.all()
-    elif usuario.groups.filter( name = 'Vendedor' ).exists():
-        for cte in Vendedor.objects.get( idusuario = usuario.pk ).all_clientes():
-            data.append( cte )
+    if usuario.is_superuser \
+            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
+            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+        for gerente in Vendedor.get_Gerentes():
+            for cte in gerente.all_clientes():
+                data.append( cte )
+    else:
+        vendedor = Vendedor.get_from_usr( usuario )
+        if not vendedor is None:
+            for cte in vendedor.all_clientes():
+                data.append( cte )
+    decorado = [ ( tmpusr.compra_a, i, tmpusr ) for i, tmpusr in enumerate( data ) ]
+    decorado.sort()
+    data = [ tmpusr for compra_a, i, tmpusr in decorado ]
     return render(
         request,
         'buyersandsellers/cliente/index.html', {
@@ -35,7 +51,7 @@ def new( request ):
     if 'POST' == request.method:
         frm = RegClienteIn( request.POST, files = request.FILES )
         if frm.is_valid():
-            perfil = Group.objects.get( name = 'Cliente' )
+            perfil = Group.objects.get( name = '010 Cliente' )
             obj = frm.save( commit = False )
             usrdep = Usr.objects.get( pk = obj.compra_a.idusuario )
             obj.username = obj.usuario
@@ -44,6 +60,17 @@ def new( request ):
             obj.groups.add( perfil )
             obj.depende_de = usrdep
             obj.save()
+            upload_to = 'usuarios'
+            if "" != request.POST.get( 'token' ):
+                file = "{}{}/{}.imgx".format( settings.MEDIA_ROOT, upload_to, request.POST.get( 'token' ) )
+                if isfile( file ):
+                    f = open( file, "r" )
+                    if "r" == f.mode:
+                        img = f.read().strip()
+                        f.close()
+                        obj.fotografia = "{}/{}".format( upload_to, img )
+                        obj.save()
+                        remove( file )
             return HttpResponseRedirect( reverse( 'cliente_ver', kwargs = { 'pk' : obj.pk } ) )
     frm = RegClienteIn( request.POST or None )
     return render( request, 'global/form.html', {
@@ -51,11 +78,23 @@ def new( request ):
         'footer' : True,
         'titulo' : 'Clientes',
         'titulo_descripcion' : 'Nuevo',
-        'frm' : frm
+        'frm' : frm,
+        'uploader' : {
+            'url' : settings.UPLOADER_URL,
+            'site' : settings.UPLOADER_SITE,
+            'key' : settings.UPLOADER_KEY,
+            'onresponse' : '',
+            'type' : 'usuarios',
+            'excecute' : '',
+            'token' : randint( 1, 999999999 ),
+            'message' : "Archivo Cargado",
+        }
     } )
     
 @valida_acceso( [ 'cliente.clientes_usuario' ] )
 def see( request, pk ):
+    if not Cliente.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     obj = Cliente.objects.get( pk = pk )
     frm = RegCliente( instance = obj )
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
@@ -79,6 +118,8 @@ def see( request, pk ):
     
 @valida_acceso( [ 'cliente.actualizar_clientes_usuario' ] )
 def update( request, pk ):
+    if not Cliente.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     obj = Cliente.objects.get( pk = pk)
     if 'POST' == request.method:
         frm = RegCliente( instance = obj, data = request.POST, files = request.FILES )
@@ -89,6 +130,17 @@ def update( request, pk ):
             obj.save()
             obj.depende_de = usrdep
             obj.save()
+            upload_to = 'usuarios'
+            if "" != request.POST.get( 'token' ):
+                file = "{}{}/{}.imgx".format( settings.MEDIA_ROOT, upload_to, request.POST.get( 'token' ) )
+                if isfile( file ):
+                    f = open( file, "r" )
+                    if "r" == f.mode:
+                        img = f.read().strip()
+                        f.close()
+                        obj.fotografia = "{}/{}".format( upload_to, img )
+                        obj.save()
+                        remove( file )
             return HttpResponseRedirect( reverse( 'cliente_ver', kwargs = { 'pk' : obj.pk } ) )
         else:
             return render( request, 'global/form.html', {
@@ -96,7 +148,17 @@ def update( request, pk ):
                 'footer' : True,
                 'titulo' : 'Clientes',
                 'titulo_descripcion' : obj,
-                'frm' : frm
+                'frm' : frm,
+                'uploader' : {
+                    'url' : settings.UPLOADER_URL,
+                    'site' : settings.UPLOADER_SITE,
+                    'key' : settings.UPLOADER_KEY,
+                    'onresponse' : '',
+                    'type' : 'usuarios',
+                    'excecute' : '',
+                    'token' : randint( 1, 999999999 ),
+                    'message' : "Archivo Cargado",
+                }
             } )
     else:
         frm = RegCliente( instance = obj )
@@ -104,12 +166,27 @@ def update( request, pk ):
             'menu_main' : Usr.objects.filter( id = request.user.pk )[ 0 ].main_menu_struct(),
             'footer' : True,
             'titulo' : 'Clientes',
-            'titulo_descripcion' : 'Nuevo',
-            'frm' : frm
+            'titulo_descripcion' : obj,
+            'frm' : frm,
+            'uploader' : {
+                'url' : settings.UPLOADER_URL,
+                'site' : settings.UPLOADER_SITE,
+                'key' : settings.UPLOADER_KEY,
+                'onresponse' : '',
+                'type' : 'usuarios',
+                'excecute' : '',
+                'token' : randint( 1, 999999999 ),
+                'message' : "Archivo Cargado",
+            }
         } )
 
 @valida_acceso( [ 'cliente.eliminar_clientes_usuario' ] )
 def delete( request, pk ):
-    Cliente.objects.get( pk = pk ).delete()
-    return HttpResponseRedirect( reverse( 'cliente_inicio' ) )
+    try:
+        if not Cliente.objects.filter( pk = pk ).exists():
+            return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
+        Cliente.objects.get( pk = pk ).delete()
+        return HttpResponseRedirect( reverse( 'cliente_inicio' ) )
+    except ProtectedError:
+        return HttpResponseRedirect( reverse( 'seguridad_item_con_relaciones' ) )
     

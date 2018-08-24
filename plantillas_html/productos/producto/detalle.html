@@ -1,0 +1,50 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+{% load util_filters %}
+
+{% block content %}
+
+{% if fotografia %}
+
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+
+        <img src="{{ MEDIA_URL }}{{ fotografia }}" class="img-fluid" />
+
+        <p>{{ prod.descripcion | as_paragraph | safe }}</p>
+
+    </div>
+    <div class="col-sm-3">
+        {% if prod.marca %}
+            <div class="alert alert-info" role="alert">
+                Marca: {{ prod.marca }}
+            </div>
+        {% endif %}
+        {% if prod.categoria %}
+            <div class="alert alert-dark" role="alert">
+                Categoría: {{ prod.categoria }}
+            </div>
+        {% endif %}
+        {% if 't' == mostrar_precio and prod.precio_de_venta %}
+            <div class="alert alert-success" role="alert">
+                Precio: $ {% language 'en' %}{{ prod.precio_de_venta | intcomma }}{% endlanguage %}
+            </div>
+        {% endif %}
+        {% if vendedor.celular %}
+            <div class="row">
+                <div class="col-sm-6 offset-md-3">
+                    <a href="https://wa.me/521{{ vendedor.celular }}/?text={{ mensaje_whats | urlencode }}" class="btn btn-success btn-lg btn-block" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        Contacta a tu vendedor
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <p></p>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

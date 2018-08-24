@@ -1,0 +1,17 @@
+{% extends "global/html_struct.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+        <p class="lead">El elemento con el que esta intentando trabajar no existe en la base de datos.</p>
+        <p>Por favor comunicate con el administrador del sistema para verficiar este problema.</p>
+        <button onclick="history.back()" type="button" class="btn btn-outline-secondary btn-block">
+            <i class="fas fa-backward"></i>
+            Regresar
+            <i class="fas fa-backward"></i>
+        </button>
+    </div>
+</div>
+
+{% endblock %}

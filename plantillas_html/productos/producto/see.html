@@ -1,0 +1,15 @@
+{% extends "global/form.html" %}
+
+{% block extrabefore %}
+
+{% if fotografia %}
+
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+        <img src="{{ MEDIA_URL }}{{ fotografia }}" class="img-fluid" />
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

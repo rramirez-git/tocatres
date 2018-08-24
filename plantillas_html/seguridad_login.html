@@ -4,7 +4,7 @@
 {% block content %}
 <form class="form-signin" method="post" autocomplete="off">
     {% csrf_token %}
-    <img src="{% static "img/logo.png" %}" />
+    <img src="{% static "img/tok3_logo.png" %}" />
     {{ frm | crispy }}
     {% if msgs %}
         {% for msg in msgs }

@@ -1,0 +1,15 @@
+{% extends "global/html_struct.html" %}
+
+{% block content %}
+
+<div class="card-columns">
+
+    {% for prod in productos %}
+
+        {% include "productos/producto/card.html" %}
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

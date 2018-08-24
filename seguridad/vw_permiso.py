@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Permission
+from django.db.models import ProtectedError
 
 from .forms import *
 from .models import *
@@ -52,6 +53,8 @@ def new( request ):
 
 @valida_acceso( [ 'permiso.permisos_permiso' ] )
 def see( request, pk ):
+    if not Permiso.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     obj = Permiso.objects.get( pk = pk )
     frm = RegPermiso( instance = obj )
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
@@ -79,6 +82,8 @@ def see( request, pk ):
 
 @valida_acceso( [ 'permiso.actualizar_permisos_permiso' ] )
 def update( request, pk ):
+    if not Permiso.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     obj = Permiso.objects.get( pk = pk )
     if "POST" == request.method:
         frm = RegPermiso( instance = obj, data = request.POST )
@@ -114,9 +119,14 @@ def update( request, pk ):
 
 @valida_acceso( [ 'permiso.eliminar_permisos_permiso' ] )
 def delete( request, pk ):
-    obj = Permiso.objects.get( pk = pk )
-    obj.delete()
-    return HttpResponseRedirect( reverse( 'permiso_inicio' ) )
+    try:
+        if not Permiso.objects.filter( pk = pk ).exists():
+            return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
+        obj = Permiso.objects.get( pk = pk )
+        obj.delete()
+        return HttpResponseRedirect( reverse( 'permiso_inicio' ) )
+    except ProtectedError:
+        return HttpResponseRedirect( reverse( 'seguridad_item_con_relaciones' ) )
 
 def PermisoStruct( permiso, level = 0 ):
     linea = '{}{}<br />'.format( "&nbsp;" * ( level * 4 ), permiso )

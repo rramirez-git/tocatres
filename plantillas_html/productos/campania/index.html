@@ -1,0 +1,39 @@
+{% extends "global/html_struct.html" %}
+{% block content %}
+
+<table class="table table-striped table-sm table-responsive-md">
+    <thead>
+        <tr>
+            <th>Campaña</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha de Término</th>
+            <th class="text-right" colspan="3"></th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>{{ reg.nombre }}</td>
+                <td>{{ reg.fecha_de_inicio }}</td>
+                <td>{{ reg.fecha_de_termino }}</td>
+                <td class="text-center">
+                    {% if perms.productos.campanas_campaña %}
+                    <a href="{% url 'campaña_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.productos.actualizar_campanas_campaña %}
+                    <a href="{% url 'campaña_actualizar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Actualizar"><i class="far fa-edit"></i></a>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    {% if perms.productos.eliminar_campanas_campaña %}
+                    <a href="{% url 'campaña_eliminar' pk=reg.pk %}" class="btn btn-outline-secondary" title="Eliminar"><i class="far fa-trash-alt"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block content %}
+
+<form onsubmit="return false">
+    <div class="form-group">
+        <label for="client">Cliente:</label>
+        <select class="form-control" id="client" name="client" onchange="Prod.hideFormsMovs()">
+            {% if my_clients %}
+            <optgroup label="Mis Clientes">
+                {% for cte in my_clients %}
+                    <option value="{{ cte.pk }}">{{ cte }}</option>
+                {% endfor %}
+            </optgroup>
+            {% endif %}
+            {% if all_clients %}
+            <optgroup label="Todos los Clientes">
+                {% for cte in all_clients %}
+                    <option value="{{ cte.pk }}">{{ cte }}</option>
+                {% endfor %}
+            </optgroup>
+            {% endif %}
+        </select>
+    </div>
+    <div class="row">
+        <div class="col-sm-4">
+            <button onclick="Prod.showAcc()" type="button" class="btn btn-outline-success btn-lg btn-block">Ver Estado de Cuenta</button>
+        </div>
+        {% if perms.productos.aplicar_cargo_cargo %}
+        <div class="col-sm-4">
+            <button onclick="Prod.showChargeForm()" type="button" class="btn btn-outline-primary btn-lg btn-block">Aplicar Venta</button>
+        </div>
+        {% endif %}
+        {% if perms.productos.aplicar_abono_abono %}
+        <div class="col-sm-4">
+            <button onclick="Prod.showPaymentForm()" type="button" class="btn btn-outline-primary btn-lg btn-block">Aplicar Pago</button>
+        </div>
+        {% endif %}
+    </div>
+</form>
+
+<script type="text/javascript">
+    let montos = {
+        {% for p in products %}
+            {{ p.pk }} : {{ p.precio_de_venta }},
+        {% endfor %}
+        0 : 0.0
+    };
+</script>
+
+<div id="aplicar-cargo" class="d-none">
+    <h4>Aplicar Cargo</h4>
+    <form onsubmit="return Prod.setChargeClientId()" method="post" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="addcharge" />
+        <input type="hidden" name="cte" value="" />
+        <div class="form-row">
+            <div class="col-sm-3 form-group">
+                <label for="fecha_cargo">Fecha</label>
+                <input type="date" class="form-control" id="fecha_cargo" name="fecha_cargo" value="{% now 'Y-m-d' %}" required="required" />
+            </div>
+            <div class="col-sm-3 form-group">
+                <label for="factura">Factura</label>
+                <input type="text" class="form-control" id="factura" name="factura" value="" maxlength="20" required="required" />
+            </div>
+            <div class="col-sm-6 form-group">
+                <label for="product">Producto</label>
+                <select class="form-control" id="product" name="product" onchange="Prod.setChargeInfo()">
+                    <option value=""></option>
+                    {% for p in products %}
+                        <option value="{{ p.pk }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-sm-8 form-group">
+                <label for="concepto_cargo">Concepto</label>
+                <input type="text" class="form-control" id="concepto_cargo" name="concepto_cargo" value="" maxlength="150" required="required" />
+            </div>
+            <div class="col-sm-4 form-group">
+                <label for="monto_cargo">Monto</label>
+                <input type="text" class="form-control" id="monto_cargo" name="monto_cargo" value="" maxlength="10" required="required" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Aplicar Cargo</button>
+    </form>
+</div>
+
+<div id="aplicar-abono" class="d-none">
+    <h4>Aplicar Abono</h4><!-- fecha, no_pago, monto, cargo, cocepto -->
+    <form onsubmit="return Prod.verifyPaymentInfo()" method="post" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="addpayment" />
+        <input type="hidden" name="cte" value="" />
+        <div class="form-row">
+            <div class="col-sm-3 form-group">
+                <label for="fecha_abono">Fecha</label>
+                <input type="date" class="form-control" id="fecha_abono" name="fecha_abono" value="{% now 'Y-m-d' %}" required="required" />
+            </div>
+            <div class="col-sm-3 form-group">
+                <label for="no_de_pago">No. de Pago</label>
+                <input type="number" class="form-control" id="no_de_pago" name="no_de_pago" value="" required="required" min="1" max="999" />
+            </div>
+            <div class="col-sm-6 form-group">
+                <label for="cargo">Aplicar al cargo</label>
+                <select onchange="Prod.setPaymentInfo()" class="form-control" id="cargo" name="cargo">
+
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-sm-8 form-group">
+                <label for="concepto_abono">Concepto</label>
+                <input type="text" class="form-control" id="concepto_abono" name="concepto_abono" value="" maxlength="150" required="required" />
+            </div>
+            <div class="col-sm-4 form-group">
+                <label for="monto_abono">Monto</label>
+                <input type="text" class="form-control" id="monto_abono" name="monto_abono" value="" maxlength="10" required="required" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Aplicar Abono</button>
+    </form>
+</div>
+
+{% endblock %}
