@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group, Permission
+from django.db.models import ProtectedError
 
 from .models import *
 from .vw_permiso import PermisoTableStruct
@@ -19,7 +20,7 @@ def index( request ):
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
             'titulo' : 'Perfiles',
-            'data' : Group.objects.all(),
+            'data' : Group.objects.all().order_by( 'name' ),
             'toolbar' : toolbar
         } )
 
@@ -51,6 +52,8 @@ def new( request ):
 
 @valida_acceso( [ 'group.perfiles_grupo' ] )
 def see( request, pk ):
+    if not Group.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     gpo = Group.objects.get( pk = pk )
     root_perms = Permiso.objects.filter( permiso_padre__isnull = True ).order_by( 'posicion' )
     permisos = []
@@ -86,6 +89,8 @@ def see( request, pk ):
 
 @valida_acceso( [ 'group.actualizar_perfiles_grupo' ] )
 def update( request, pk ):
+    if not Group.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     gpo = Group.objects.get( pk = pk )
     if "POST" == request.method:
         gpo.name = request.POST.get( 'nombre' )
@@ -120,5 +125,10 @@ def update( request, pk ):
 
 @valida_acceso( [ 'group.eliminar_perfiles_grupo' ] )
 def delete( request, pk ):
-    Group.objects.get( pk = pk ).delete()
-    return HttpResponseRedirect( reverse( 'perfil_inicio' ) )
+    try:
+        if not Group.objects.filter( pk = pk ).exists():
+            return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
+        Group.objects.get( pk = pk ).delete()
+        return HttpResponseRedirect( reverse( 'perfil_inicio' ) )
+    except ProtectedError:
+        return HttpResponseRedirect( reverse( 'seguridad_item_con_relaciones' ) )

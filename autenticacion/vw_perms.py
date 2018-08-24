@@ -17,7 +17,7 @@ def index( request ):
             'data' : Permission.objects.all().order_by( 'content_type' ),
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
-            'titulo' : 'Autenticacion/Permisos',
+            'titulo' : 'Autenticacion / Permisos',
             'toolbar' : toolbar
         }
     )

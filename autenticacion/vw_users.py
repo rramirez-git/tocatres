@@ -17,7 +17,7 @@ def index( request ):
             'data' : User.objects.all(),
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
-            'titulo' : 'Autenticacion/Usuarios',
+            'titulo' : 'Autenticacion / Usuarios',
             'toolbar' : toolbar
         }
     )

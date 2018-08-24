@@ -1,4 +1,54 @@
-{% extends "html_struct.html" %}
-{% load static %}
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
 {% block content %}
+
+{% for llave, valor in extra.items %}
+<p><strong>{{ llave }}</strong>: {{valor}}</p>
+{% endfor %}
+
+<!-- Agregado especifico por aplicacion -->
+
+{% if saldo %}
+
+    <p class="lead">Tu saldo es de <span class="text-primary">$ {% language 'en' %}{{ saldo | intcomma }}{% endlanguage %}</span>.</p>
+
+    <div class="row">
+        <div class="col-sm-6 offset-md-3">
+            <a href="{% url 'mi_saldo' %}" class="btn btn-primary btn-lg btn-block">Detalle de tu saldo</a>
+        </div>
+    </div>
+
+    {% if vendedor.celular %}
+    
+        <p></p>
+        <div class="row">
+            <div class="col-sm-6 offset-md-3">
+                <a href="https://wa.me/521{{ vendedor.celular }}" class="btn btn-success btn-lg btn-block" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    Contacta a tu vendedor
+                </a>
+            </div>
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+{% if productos %}
+
+    <p class="lead font-weight-bold">Productos que pueden interesarte...</p>
+
+    <div class="card-columns">
+
+        {% for prod in productos %}
+
+            {% include "productos/producto/card.html" %}
+
+        {% endfor %}
+        
+    </div>
+
+{% endif %}
+
 {% endblock %}

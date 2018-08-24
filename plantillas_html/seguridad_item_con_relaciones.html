@@ -1,0 +1,18 @@
+{% extends "global/html_struct.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-6 offset-md-3">
+        <p class="lead">El elemento que esta tratando de eliminar de la base de datos esta fuertemente relacionado con otros elementos, por ello no puedes eliminarlo.</p>
+        <p>Por favor comunicate con el administrador del sistema para verficiar esta situación.</p>
+        <button onclick="history.back()" type="button" class="btn btn-outline-secondary btn-block">
+            <i class="fas fa-backward"></i>
+            Regresar
+            <i class="fas fa-backward"></i>
+        </button>
+        <p>Este tipo de situaciones puede ocurrir, por ejemplo, cuando intentas eliminar un cliente pero tiene ventas y/o pagos asignados o relacionados.</p>
+    </div>
+</div>
+
+{% endblock %}
