@@ -1,18 +1,23 @@
 class clsApp {
     inputFileOpen(  ) {
         let iframe_url = uploader.url + "?";
-        if( uploader.site ) { iframe_url += "site=" + uploader.site + "&"; }
-        if( uploader.key ) { iframe_url += "key=" + uploader.key + "&"; }
         if( uploader.onresponse ) { iframe_url += "onresponse=" + uploader.onresponse + "&"; }
-        if( uploader.type ) { iframe_url += "type=" + uploader.type + "&"; }
         if( uploader.excecute ) { iframe_url += "excecute=" + uploader.excecute + "&"; }
-        if( uploader.token ) { iframe_url += "token=" + uploader.token + "&"; }
         if( uploader.message ) { iframe_url += "message=" + uploader.message + "&"; }
 
         let iframe = $( `<iframe style="width: 100%;" src="${iframe_url}" id="uploader-frame" frameborder="0"></iframe>` );
 
         this.openPanel( ' ', "Cargar Archivo" );
         $( "#modal-panel-message .modal-body").html( iframe[0].outerHTML );
+    }
+    inputLoadedFile( response ) {
+        if( "ok" == response.response.toLowerCase().trim() && "" != response.file ) {
+            $( "#token" ).attr( 'value', response.file );
+            uploader.container.find( 'img' ).remove();
+            uploader.container.find( 'label' ).prepend( $( `<img src="${MEDIA_URL + uploader.type + '/' + response.file }" class="rounded-circle float-right" height="40" width="40" />` ) )
+            this.closePanel();
+            //alert( uploader.type );
+        }
     }
     checkInputIn( idcontainer ) {
         $( '#' + idcontainer + ' input[type="checkbox"]' ).attr( 'checked', true );
@@ -26,6 +31,9 @@ class clsApp {
         let html = template( { "title" : title, "body" : body, "footer" : footer, "close" : close } );
         $( document.body ).append( $( html ) );
         $( "#modal-panel-message" ).modal();
+    }
+    closePanel() {
+        $( "#modal-panel-message .close" ).trigger('click')
     }
 }
 
@@ -97,7 +105,7 @@ class clsProd {
     }
 }
 
-let App = new clsApp();
-let Prod = new clsProd();
+window.App = new clsApp();
+window.Prod = new clsProd();
 
 $( document ).ready( () => { $('[data-toggle="tooltip"]').tooltip(); } );

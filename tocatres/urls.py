@@ -24,12 +24,14 @@ from seguridad import vw_permiso, vw_perfil, vw_usuario
 from autenticacion import vw_perms, vw_users
 from buyersandsellers import vw_cliente, vw_vendedor, vw_gerente
 from productos import vw_producto, vw_campania, vw_cargos_abonos
+from uploader import vw_uploader
 
 urlpatterns = [
     path( 'admin/', admin.site.urls ),
 
-    path( 'elemento-no-encontrado/',     views.item_not_found,       name = 'seguridad_item_no_encontrado' ),
-    path( 'elemento-con-relaciones/',    views.item_with_relations,  name = 'seguridad_item_con_relaciones' ),
+    path( 'elemento-no-encontrado/',    views.item_not_found,       name = 'seguridad_item_no_encontrado' ),
+    path( 'elemento-con-relaciones/',   views.item_with_relations,  name = 'seguridad_item_con_relaciones' ),
+    path( 'uploader/<type>/',           vw_uploader.uplopader,      name = 'uploader' ),
     path( 'logout/',                    views.logout,               name = 'seguridad_logout' ),
     path( 'my-dashboard/',              views.index,                name = 'seguridad_inicio' ),
     path( '',                           views.login,                name = 'seguridad_login' ),

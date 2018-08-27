@@ -31,7 +31,8 @@
 		{% endif %}
 		<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
 		<script type="text/javascript">
-			let BASE_URL = '//{{ request.get_host }}'
+			let BASE_URL = '//{{ request.get_host }}';
+			let MEDIA_URL = BASE_URL + '{{ MEDIA_URL }}';
 		</script>
 	</head>
 	<body>

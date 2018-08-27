@@ -50,15 +50,8 @@ def new( request ):
             obj.save()
             upload_to = 'usuarios'
             if "" != request.POST.get( 'token' ):
-                file = "{}{}/{}.imgx".format( settings.MEDIA_ROOT, upload_to, request.POST.get( 'token' ) )
-                if isfile( file ):
-                    f = open( file, "r" )
-                    if "r" == f.mode:
-                        img = f.read().strip()
-                        f.close()
-                        obj.fotografia = "{}/{}".format( upload_to, img )
-                        obj.save()
-                        remove( file )
+                obj.fotografia = "{}/{}".format( upload_to, request.POST.get( 'token' ) )
+                obj.save()
             return HttpResponseRedirect( reverse( 'usuario_ver', kwargs = { 'pk' : obj.pk } ) )
     frm = RegUsuario( request.POST or None )
     return render( request, 'global/form.html', {
@@ -68,13 +61,9 @@ def new( request ):
         'titulo_descripcion' : 'Nuevo',
         'frm' : frm,
         'uploader' : {
-            'url' : settings.UPLOADER_URL,
-            'site' : settings.UPLOADER_SITE,
-            'key' : settings.UPLOADER_KEY,
-            'onresponse' : '',
+            'onresponse' : 'window.parent.App.inputLoadedFile',
             'type' : 'usuarios',
-            'excecute' : '',
-            'token' : randint( 1, 999999999 ),
+            'excecute' : 'yes',
             'message' : "Archivo Cargado",
         }
     } )
@@ -126,15 +115,8 @@ def update( request, pk ):
             obj.save()
             upload_to = 'usuarios'
             if "" != request.POST.get( 'token' ):
-                file = "{}{}/{}.imgx".format( settings.MEDIA_ROOT, upload_to, request.POST.get( 'token' ) )
-                if isfile( file ):
-                    f = open( file, "r" )
-                    if "r" == f.mode:
-                        img = f.read().strip()
-                        f.close()
-                        obj.fotografia = "{}/{}".format( upload_to, img )
-                        obj.save()
-                        remove( file )
+                obj.fotografia = "{}/{}".format( upload_to, request.POST.get( 'token' ) )
+                obj.save()
             return HttpResponseRedirect( reverse( 'usuario_ver', kwargs = { 'pk' : obj.pk } ) )
         else:
             return render( request, 'global/form.html', {
@@ -144,13 +126,9 @@ def update( request, pk ):
                 'titulo_descripcion' : usr,
                 'frm' : frm,
                 'uploader' : {
-                    'url' : settings.UPLOADER_URL,
-                    'site' : settings.UPLOADER_SITE,
-                    'key' : settings.UPLOADER_KEY,
-                    'onresponse' : '',
+                    'onresponse' : 'window.parent.App.inputLoadedFile',
                     'type' : 'usuarios',
-                    'excecute' : '',
-                    'token' : randint( 1, 999999999 ),
+                    'excecute' : 'yes',
                     'message' : "Archivo Cargado",
                 }
             } )
@@ -163,13 +141,9 @@ def update( request, pk ):
             'titulo_descripcion' : usr,
             'frm' : frm,
             'uploader' : {
-                'url' : settings.UPLOADER_URL,
-                'site' : settings.UPLOADER_SITE,
-                'key' : settings.UPLOADER_KEY,
-                'onresponse' : '',
+                'onresponse' : 'window.parent.App.inputLoadedFile',
                 'type' : 'usuarios',
-                'excecute' : '',
-                'token' : randint( 1, 999999999 ),
+                'excecute' : 'yes',
                 'message' : "Archivo Cargado",
             }
         } )

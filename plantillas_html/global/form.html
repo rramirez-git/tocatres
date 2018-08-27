@@ -43,16 +43,14 @@
     <script type="text/javascript">
         let input = $( 'input[type="file"]' );
         input.parent().append( $( `<button onclick="App.inputFileOpen()" type="button" class="btn btn-outline-secondary" id="btn-save" >Cargar</button>` ) );
-        input.parent().append( $( `<input type="hidden" id="token" name="token" value="{{uploader.token}}" />` ) );
+        input.parent().append( $( `<input type="hidden" id="token" name="token" value="" />` ) );
         let uploader = {
-            url : '{{uploader.url}}',
-            site : '{{uploader.site}}',
-            key : '{{uploader.key}}',
+            url : '{% url "uploader" type=uploader.type %}',
             onresponse : '{{uploader.onresponse}}',
             type : '{{uploader.type}}',
             excecute : '{{uploader.excecute}}',
-            token : '{{uploader.token}}',
-            message : '{{uploader.message}}'
+            message : '{{uploader.message}}',
+            container : input.parent().parent()
         }
         input.remove();
     </script>

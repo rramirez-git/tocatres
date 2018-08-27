@@ -130,20 +130,12 @@ MEDIA_ROOT = os.path.join( '/home/tocatres/public_html/', 'media/' )
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SESSION_SAVE_EVERY_REQUEST = True
 
-UPLOADER_KEY = '15c3cbda25ff5c127489191b9f198807803ced43'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if False == DEBUG:
-    UPLOADER_URL = 'http://uploader.tocatres.com/uploader.php'
-    UPLOADER_SITE = 'tocatres'
     STATIC_ROOT = os.path.join( '/home/tocatres/public_html/', 'static/' )
     MEDIA_ROOT = os.path.join( '/home/tocatres/public_html/', 'media/' )
 else:
-    # UPLOADER_URL = 'http://dev.unam_dba.com/uploader.php'
-    # UPLOADER_SITE = 'tocatres_dev'
-    UPLOADER_URL = 'https://imagilex.com.mx/uploader.php'
-    UPLOADER_SITE = 'tocatres_qa'
     STATIC_ROOT = os.path.join( BASE_DIR, 'files/static/' )
     MEDIA_ROOT = os.path.join( BASE_DIR, 'files/media/' )
