@@ -27,18 +27,26 @@ def index( request ):
         saldo += charge.saldo()
     mostrar_precio = 'f'
     productos = []
-    for c in Campaña.objects.filter( usuarios__in = [ usuario ], fecha_de_inicio__lte = date.today(), fecha_de_termino__gte = date.today() ):
-        if c.mostrar_precio_de_venta:
-            mostrar_precio = 't'
-        for p in c.productos.all():
-            if 0 == productos.count( p ):
-                productos.append( p )
-    shuffle( productos )
+    if usuario.groups.filter( name__icontains = 'Cliente' ).exists():
+        for c in Campaña.objects.filter( usuarios__in = [ usuario ], fecha_de_inicio__lte = date.today(), fecha_de_termino__gte = date.today() ):
+            if c.mostrar_precio_de_venta:
+                mostrar_precio = 't'
+            prods2 = [ p for p in c.productos.filter( esta_activo = True ) if 0 == productos.count( p ) ]
+            productos += prods2
+        shuffle( productos )
+        if len( productos ) < 6:
+            prods2 = [ prod for prod in Producto.objects.filter( esta_activo = True ) ]
+            shuffle( prods2 )
+            productos = productos + prods2[ : 6 ]
     vendedor = None
     cte = Cliente.get_from_usr( cte )
     alias = ''
+    txt_productos = ''
+    wapp_vendedor = None
     if not cte is None:
         vendedor = cte.compra_a
+        wapp_vendedor = vendedor.celular
+        txt_productos = cte.texto_productos
         if "" != cte.alias and not cte.alias is None:
             alias = cte.alias
         else:
@@ -55,6 +63,8 @@ def index( request ):
             'mostrar_precio' : mostrar_precio,
             'saldo' : saldo,
             'vendedor' : vendedor,
+            'txt_productos' : txt_productos,
+            'wapp_vendedor' : wapp_vendedor,
             "extra": extra
         } )
 

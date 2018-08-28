@@ -10,6 +10,7 @@ class RegProductoCPrecio( forms.ModelForm ):
             'imagen',
             'esta_activo',
             'marca',
+            'modelo',
             'categoria',
             'precio_de_compra',
             'precio_de_venta',
@@ -18,7 +19,9 @@ class RegProductoCPrecio( forms.ModelForm ):
         labels = {
             'sku' : 'SKU',
             'categoria' : 'Categoría',
-            'descripcion' : 'Descripción'
+            'descripcion' : 'Descripción',
+            'precio_de_compra' : 'Costo',
+            'precio_de_venta' : 'Precio'
         }
 
 class RegProducto( forms.ModelForm ):
@@ -30,6 +33,7 @@ class RegProducto( forms.ModelForm ):
             'imagen',
             'esta_activo',
             'marca',
+            'modelo',
             'categoria',
             'descripcion'
         ]

@@ -159,18 +159,20 @@ def novedades( request ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     mostrar_precio = 'f'
     productos = []
-    for c in Campaña.objects.filter( usuarios__in = [ usuario ], fecha_de_inicio__lte = date.today(), fecha_de_termino__gte = date.today() ):
-        if c.mostrar_precio_de_venta:
-            mostrar_precio = 't'
-        for p in c.productos.all():
-            if 0 == productos.count( p ):
-                productos.append( p )
-    shuffle( productos )
+    # for c in Campaña.objects.filter( usuarios__in = [ usuario ], fecha_de_inicio__lte = date.today(), fecha_de_termino__gte = date.today() ):
+    #     if c.mostrar_precio_de_venta:
+    #         mostrar_precio = 't'
+    #     for p in c.productos.all():
+    #         if 0 == productos.count( p ):
+    #             productos.append( p )
+    for p in Producto.objects.all():
+        productos.append( p )
+    #shuffle( productos )
     return render( request, 'productos/campania/novedades.html', {
         'menu_main' : usuario.main_menu_struct(),
         'footer' : True,
-        'titulo' : 'Novedades',
-        'mostrar_precio' : mostrar_precio,
+        'titulo' : None,
+        'mostrar_precio' : 't',
         'productos' : productos
     } )
 

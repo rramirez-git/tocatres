@@ -1,5 +1,5 @@
 <!-- footer.html (Open) -->
-<footer class="fixed-bottom">
+<footer class="fixed-bottom" >
     {% if request.session.usuario_pic %}
         <img src="{{ MEDIA_URL }}{{ request.session.usuario_pic }}" title="{{ request.user.get_full_name }}" class="rounded-circle float-right" height="30" width="30" data-toggle="tooltip" />
     {% endif %}

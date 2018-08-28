@@ -4,26 +4,36 @@
 
 {% block content %}
 
+<form method="post" enctype="application/x-www-form-urlencoded">
+{% csrf_token %}
+
 <table class="table table-striped table-sm table-responsive-md">
     <thead>
         <tr>
-            <th>Producto</th>
             <th>SKU</th>
+            <th>Producto</th>
             <th>Marca</th>
+            <th>Modelo</th>
             <th>Categoría</th>
             {% if perms.productos.administrar_precios_producto %}
-                <th>Precio de Compra</th>
-                <th>Precio de Venta</th>
+                <th>Costo</th>
+                <th>Precio</th>
             {% endif %}
-            <th class="text-right" colspan="3"></th>
+            <th>Activo</th>
+            <th class="text-right" colspan="3">
+                {% if perms.productos.activar_y_desactivar_productos_producto %}
+                <button type="submit" class="btn btn-outline-secondary"><i class="far fa-save"></i> Guardar</button>
+                {% endif %}
+            </th>
         </tr>
     </thead>
     <tbody id="data-tbl">
         {% for reg in data %}
             <tr>
-                <td>{{ reg.nombre }}</td>
                 <td>{{ reg.sku }}</td>
+                <td>{{ reg.nombre }}</td>
                 <td>{{ reg.marca }}</td>
+                <td>{% if reg.modelo %}{{ reg.modelo }}{% endif %}</td>
                 <td>{{ reg.categoria }}</td>
                 {% if perms.productos.administrar_precios_producto %}
                     {% language 'en' %}
@@ -31,6 +41,9 @@
                     <td>$ {{ reg.precio_de_venta | intcomma }}</td>
                     {% endlanguage %}
                 {% endif %}
+                <td>
+                    <input name="producto_activo_id" value="{{ reg.pk }}" class="form-control" {% if reg.esta_activo %}checked="checked"{% endif %} type="checkbox" {% if perms.productos.activar_y_desactivar_productos_producto %}{% else %}disabled="disabled"{% endif %} />
+                </td>
                 <td class="text-center">
                     {% if perms.productos.administrar_productos_producto %}
                     <a href="{% url 'producto_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
@@ -50,5 +63,7 @@
         {% endfor %}
     </tbody>
 </table>
+
+</form>
 
 {% endblock %}

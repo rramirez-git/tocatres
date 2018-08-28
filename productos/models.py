@@ -13,12 +13,13 @@ class Producto( models.Model ):
     imagen = models.ImageField( blank = True, null = True, upload_to = 'productos' )
     esta_activo = models.BooleanField( default = True )
     marca = models.CharField( max_length = 100, null = True )
+    modelo = models.CharField( max_length = 100, null = True )
     categoria = models.CharField( blank = True, null = True, max_length = 100 )
     precio_de_compra = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     precio_de_venta = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     descripcion = models.TextField()
     class Meta:
-        ordering = [ 'categoria', 'marca', 'nombre' ]
+        ordering = [ '-esta_activo', 'sku', 'categoria', 'marca', 'modelo', 'nombre' ]
     def __unicode__( self ):
         return "{} / {} / {}".format( self.categoria, self.marca, self.nombre )
     def __str__( self ):

@@ -10,10 +10,20 @@
         </button>
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav">
-                {% for mp in menu_main %}
+                {% for mp in menu_main.perms %}
                     <li class="nav-item">
                     {% if 0 == mp.items_qty %}
-                        <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" class="nav-link">{{ mp.permiso.mostrar_como }}</a>
+                        {% if 'vw_contacto' == mp.permiso.vista %}
+                            {% if menu_main.wapp_vendedor %}
+                                {% for g in request.user.groups.all %}
+                                    {% if 'Cliente' in g.name %}
+                                        <a href="https://wa.me/521{{ menu_main.wapp_vendedor }}" class="nav-link" target="_blank">{{ mp.permiso.mostrar_como }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% else %}
+                            <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" class="nav-link">{{ mp.permiso.mostrar_como }}</a>
+                        {% endif %}
                     {% else %}
                         <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" id="mainMenu-{{ mp.permiso.pk }}" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ mp.permiso }}</a>
                         <div class="dropdown-menu" aria-labelledby="mainMenu-{{ mp.permiso.pk }}">

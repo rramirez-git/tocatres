@@ -110,7 +110,10 @@ class Usr( User ):
                         items.append( p )
                 item = { 'permiso' : rp, 'items' : items, 'items_qty' : len(items) }
                 mm.append( item )
-        return mm
+        wapp_vendedor = None
+        if self.groups.filter( name__contains = 'Cliente' ).exists() and not self.depende_de is None :
+            wapp_vendedor = self.depende_de.celular
+        return { 'perms' : mm, 'wapp_vendedor' : wapp_vendedor }
     def __gt__( self, usr2 ):
         return self.__str__() > usr2.__str__()
     def __ge__( self, usr2 ):

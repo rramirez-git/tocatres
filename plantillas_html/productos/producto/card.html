@@ -1,10 +1,23 @@
 {% load util_filters %}
+{% load humanize %}
+{% load i18n %}
 
 <div class="card" onclick="location.href='{% url 'campaña_novedades_producto' pk=prod.pk mp=mostrar_precio %}'">
     <img class="card-img-top" src="{{ MEDIA_URL }}{{ prod.imagen }}" title="{{ prod.nombre }}" data-toggle="tooltip" />
     <div class="card-body">
         {% if prod.nombre %}<h5 class="card-title">{{ prod.nombre }}</h5>{% endif %}
-        {% if prod.descripcion %}<p class="card-text"><small>{{ prod.descripcion | summary }}</small></p>{% endif %}
-        {% if prod.sku %}<p class="card-text"><small class="text-muted">SKU: {{ prod.sku }}</small></p>{% endif %}
+        {% if prod.descripcion %}
+            <p class="card-text">
+                <small>{{ prod.descripcion | summary }}</small>
+            </p>
+        {% endif %}
+        <p class="card-text">
+            {% if prod.precio_de_venta %}
+                <small class="float-right">$ {% language 'en' %}{{ prod.precio_de_venta | intcomma }}{% endlanguage %}</small>
+            {% endif %}
+            {% if prod.sku %}
+                <small class="text-muted d-inline-block">SKU: {{ prod.sku }}</small>
+            {% endif %}
+        </p>
     </div>
 </div>
