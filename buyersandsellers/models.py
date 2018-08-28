@@ -40,6 +40,7 @@ class Cliente( Usr ):
     idcliente = models.AutoField( primary_key = True )
     compra_a = models.ForeignKey( Vendedor, on_delete = models.CASCADE, related_name = '+' )
     alias = models.CharField( blank = False, max_length = 100 )
+    texto_productos = models.CharField( blank = True, max_length = 250, default = 'Productos que pueden interesarte...' )
     def __unicode__( self ):
         return "{} ({})".format( self.get_full_name(), self.usuario )
     def __str__( self ):

@@ -5,14 +5,7 @@
 {% block content %}
 
 <p class="lead">
-
-    {% if vendedor.celular %}
-        <a class="btn btn-success float-right" href="https://wa.me/521{{ vendedor.celular }}/?text={{ mensaje_whats | urlencode }}" target="_blank">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-    {% endif %}
-
-    Saldo Acual: 
+    Saldo: 
     {% language 'en' %}
         ${{ saldo | intcomma }}
     {% endlanguage %}

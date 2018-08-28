@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.conf import settings
 from random import randint
 from os.path import isfile
@@ -12,6 +12,13 @@ from seguridad.mkitsafe import *
 @valida_acceso( [ 'producto.administrar_productos_producto' ] )
 def index( request ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
+    if "POST" == request.method:
+        for prod in Producto.objects.filter( Q( pk__in = request.POST.getlist( 'producto_activo_id' ) ) ):
+            prod.esta_activo = True
+            prod.save()
+        for prod in Producto.objects.filter( ~Q( pk__in = request.POST.getlist( 'producto_activo_id' ) ) ):
+            prod.esta_activo = False
+            prod.save()
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'producto.agregar_productos_producto' ):
         toolbar.append( { 'type' : 'link', 'view' : 'producto_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
@@ -20,7 +27,7 @@ def index( request ):
         'productos/producto/index.html', {
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
-            'titulo' : 'Productos',
+            'titulo' : 'Catálogo',
             'data' : Producto.objects.all(),
             'toolbar' : toolbar
         } )
@@ -182,7 +189,7 @@ def detalle( request, pk, mp ):
     obj = Producto.objects.get( pk = pk )
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'campaña.novedades_campaña' ):
-        toolbar.append( { 'type' : 'link', 'view' : 'campaña_novedades', 'label' : '<i class="fas fa-glasses"></i> Ver Novedades' } )
+        toolbar.append( { 'type' : 'link', 'view' : 'campaña_novedades', 'label' : '<i class="fas fa-glasses"></i> Ver Catálogo' } )
     vendedor = None
     cte = Cliente.get_from_usr( usuario )
     if not cte is None:
@@ -191,7 +198,7 @@ def detalle( request, pk, mp ):
     return render( request, 'productos/producto/detalle.html', {
         'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
-            'titulo' : obj.nombre,
+            'titulo' : obj,
             'titulo_descripcion' : "SKU: " + obj.sku,
             'read_only' : True,
             'prod' : obj,

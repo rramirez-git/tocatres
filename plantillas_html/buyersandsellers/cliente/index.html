@@ -4,9 +4,9 @@
 <table class="table table-striped table-sm table-responsive-md">
     <thead>
         <tr>
-            <th>Vendedor</th>
             <th></th>
             <th>Cliente</th>
+            <th>Vendedor</th>
             <th>E-Mail</th>
             <th>Celular</th>
             <th>Teléfono</th>
@@ -16,9 +16,9 @@
     <tbody id="data-tbl">
         {% for reg in data %}
             <tr>
-                <td>{{ reg.compra_a }}</td>
                 <td>{% if reg.fotografia %}<img class="rounded-circle" src="{{ MEDIA_URL }}{{ reg.fotografia }}" height="40" width="40" />{% endif %}</td>
                 <td>{{ reg }}</td>
+                <td>{{ reg.compra_a }}</td>
                 <td>
                     {% if reg.email %}
                     <a href="mailto:{{ reg.email }}">

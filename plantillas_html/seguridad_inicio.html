@@ -11,33 +11,13 @@
 
 {% if saldo %}
 
-    <p class="lead">Tu saldo es de <span class="text-primary">$ {% language 'en' %}{{ saldo | intcomma }}{% endlanguage %}</span>.</p>
-
-    <div class="row">
-        <div class="col-sm-6 offset-md-3">
-            <a href="{% url 'mi_saldo' %}" class="btn btn-primary btn-lg btn-block">Detalle de tu saldo</a>
-        </div>
-    </div>
-
-    {% if vendedor.celular %}
-    
-        <p></p>
-        <div class="row">
-            <div class="col-sm-6 offset-md-3">
-                <a href="https://wa.me/521{{ vendedor.celular }}" class="btn btn-success btn-lg btn-block" target="_blank">
-                    <i class="fab fa-whatsapp"></i>
-                    Contacta a tu vendedor
-                </a>
-            </div>
-        </div>
-
-    {% endif %}
+    <p class="lead">Tu saldo es de <a href="{% url 'mi_saldo' %}">$ {% language 'en' %}{{ saldo | intcomma }}{% endlanguage %}</a>.</p>
 
 {% endif %}
 
 {% if productos %}
 
-    <p class="lead font-weight-bold">Productos que pueden interesarte...</p>
+    <p class="lead font-weight-bold">{{ txt_productos }}</p>
 
     <div class="card-columns">
 

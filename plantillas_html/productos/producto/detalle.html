@@ -31,16 +31,6 @@
                 Precio: $ {% language 'en' %}{{ prod.precio_de_venta | intcomma }}{% endlanguage %}
             </div>
         {% endif %}
-        {% if vendedor.celular %}
-            <div class="row">
-                <div class="col-sm-6 offset-md-3">
-                    <a href="https://wa.me/521{{ vendedor.celular }}/?text={{ mensaje_whats | urlencode }}" class="btn btn-success btn-lg btn-block" target="_blank">
-                        <i class="fab fa-whatsapp"></i>
-                        Contacta a tu vendedor
-                    </a>
-                </div>
-            </div>
-        {% endif %}
         <p></p>
     </div>
 </div>

@@ -28,8 +28,8 @@ from productos import vw_producto, vw_campania, vw_cargos_abonos
 urlpatterns = [
     path( 'admin/', admin.site.urls ),
 
-    path( 'elemento-no-encontrado/',     views.item_not_found,       name = 'seguridad_item_no_encontrado' ),
-    path( 'elemento-con-relaciones/',    views.item_with_relations,  name = 'seguridad_item_con_relaciones' ),
+    path( 'elemento-no-encontrado/',    views.item_not_found,       name = 'seguridad_item_no_encontrado' ),
+    path( 'elemento-con-relaciones/',   views.item_with_relations,  name = 'seguridad_item_con_relaciones' ),
     path( 'logout/',                    views.logout,               name = 'seguridad_logout' ),
     path( 'my-dashboard/',              views.index,                name = 'seguridad_inicio' ),
     path( '',                           views.login,                name = 'seguridad_login' ),
@@ -93,7 +93,7 @@ urlpatterns = [
     path( 'movimientos/ventas/<pk>/',   vw_cargos_abonos.getcargos, name = 'cargos_abonos_get_cargos' ),
 
     path( 'ventas/eliminar/<pk>/<pkcte>/',  vw_cargos_abonos.delete_cargo,  name = 'cargos_abonos_eliminar_cargo' ),
-    path( 'pagos/eliminar/<pk>/<pkcte>/',  vw_cargos_abonos.delete_abono,  name = 'cargos_abonos_eliminar_abono' ),
+    path( 'pagos/eliminar/<pk>/<pkcte>/',   vw_cargos_abonos.delete_abono,  name = 'cargos_abonos_eliminar_abono' ),
 
     path( 'tu-saldo/', vw_cargos_abonos.mi_saldo,   name = 'mi_saldo' ),
     

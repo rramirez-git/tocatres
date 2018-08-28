@@ -151,10 +151,8 @@ def mi_saldo( request ):
         vendedor = cte.compra_a
     return render( request, 'productos/cargos-abonos/mi-saldo.html', {
         'menu_main' : usuario.main_menu_struct(),
-            'footer' : True,
-            'titulo' : 'Mi Saldo',
-            'movs' : movs[ : 15 ],
-            'saldo' : saldo,
-            'vendedor' : vendedor,
-            'mensaje_whats' : 'Información de mi Saldo'
+        'footer' : True,
+        'titulo' : None,
+        'movs' : movs[ : 15 ],
+        'saldo' : saldo
     } )

@@ -2,14 +2,21 @@
 
 {% block content %}
 
+{% regroup productos by categoria as lista_categorias %}
+
+{% for categoria in lista_categorias %}
+<h3>{{ categoria.grouper }}</h3>
+
 <div class="card-columns">
 
-    {% for prod in productos %}
+    {% for prod in categoria.list %}
 
-        {% include "productos/producto/card.html" %}
+    {% include "productos/producto/card.html" %}
 
     {% endfor %}
 
 </div>
+
+{% endfor %}
 
 {% endblock %}
