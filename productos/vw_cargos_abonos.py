@@ -72,6 +72,8 @@ def index( request ):
 
 @valida_acceso( [ 'cargo.ventas_y_pagos_cargo' ] )
 def account( request, pk ):
+    if not Usr.objects.filter( pk = pk ).exists():
+        return HttpResponseRedirect( reverse( 'seguridad_item_no_encontrado' ) )
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     cte = Usr.objects.get( pk = pk )
     charges = Cargo.objects.filter( cliente = cte )

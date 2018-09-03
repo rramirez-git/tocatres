@@ -95,6 +95,15 @@ class clsProd {
     showAcc() {
         location.href = BASE_URL + '/movimientos/' + $( "#client" ).val();
     }
+    sumTotalHL() {
+        let suma = 0.0;
+        $( `#data-tbl input[type="checkbox"]` ).each( function(){ 
+            if( this.checked ) {
+                suma+= parseFloat( $( this ).attr( 'data-monto' ) ); 
+            }
+        } );
+        $( "#total" ).html( suma );
+    }
 }
 
 let App = new clsApp();

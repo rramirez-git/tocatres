@@ -23,7 +23,7 @@ from seguridad import views
 from seguridad import vw_permiso, vw_perfil, vw_usuario
 from autenticacion import vw_perms, vw_users
 from buyersandsellers import vw_cliente, vw_vendedor, vw_gerente
-from productos import vw_producto, vw_campania, vw_cargos_abonos
+from productos import vw_producto, vw_campania, vw_cargos_abonos, vw_productos_reportes
 
 urlpatterns = [
     path( 'admin/', admin.site.urls ),
@@ -96,7 +96,13 @@ urlpatterns = [
     path( 'pagos/eliminar/<pk>/<pkcte>/',   vw_cargos_abonos.delete_abono,  name = 'cargos_abonos_eliminar_abono' ),
 
     path( 'tu-saldo/', vw_cargos_abonos.mi_saldo,   name = 'mi_saldo' ),
-    
+
+    path( 'reportes/saldos/',                               vw_productos_reportes.saldos,                   name = 'reporte_productos_saldos' ),
+    path( 'reportes/ventas/',                               vw_productos_reportes.ventas,                   name = 'reporte_productos_ventas' ),
+    path( 'reportes/pagos/',                                vw_productos_reportes.pagos,                    name = 'reporte_productos_pagos' ),
+    path( 'reportes/generar-hoja-de-liquidacion/',          vw_productos_reportes.genHojasLiquidacion,      name = 'reporte_productos_gen_hojliq' ),
+    path( 'reportes/hojas-de-liquidacion/',                 vw_productos_reportes.hojasLiquidacion,         name = 'reporte_productos_hojliq' ),
+    path( 'reportes/detalle-de-hoja-de-liquidacion/<pk>/',  vw_productos_reportes.detalleHojaLiquidación,   name = 'reporte_productos_det_hojliq' ),    
 ]
 
 urlpatterns += static( settings.MEDIA_URL, document_root = settings.MEDIA_ROOT )

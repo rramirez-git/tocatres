@@ -24,8 +24,16 @@ class Vendedor( Usr ):
             return Vendedor.objects.get( idusuario = usr.pk )
         return None
     def get_Gerentes():
+        """
+        Devuelve QuerySet de vendedores que son gerentes (que no dependen de nadie)
+        """
         return Vendedor.objects.filter( reporta_a = None ).order_by( 'first_name', 'last_name' )
     def get_Vendedores( gerente = None ):
+        """
+        gerente debe ser de tipo vendedores
+
+        Devuelve la lista de vendedores
+        """
         vendedores = []
         if gerente is None:
             gerentes = Vendedor.get_Gerentes()

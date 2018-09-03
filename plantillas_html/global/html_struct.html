@@ -29,6 +29,9 @@
 		<script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/datepicker-es.js' %}"></script>
 		{% endif %}
+		{% if req_chart %}
+		<script type="text/javascript" src="{% static 'js/chart-272.min.js' %}"></script>
+		{% endif %}
 		<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
 		<script type="text/javascript">
 			let BASE_URL = '//{{ request.get_host }}'

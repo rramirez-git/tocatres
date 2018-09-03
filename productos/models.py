@@ -66,6 +66,23 @@ class Cargo( models.Model ):
     def no_abonos( self ):
         return len( Abono.objects.filter( cargo = self ) )
 
+class HojaLiquidacion( models.Model ):
+    idhojaliquidacion = models.AutoField( primary_key = True )
+    identificador = models.CharField( blank = False, max_length = 100 )
+    fecha_creacion = models.DateField( default = date.today )
+    fecha_entrega = models.DateField( default = date.today )
+    fecha_banco = models.DateField( blank = True, null = True )
+    generada_por = models.ForeignKey( Usr, related_name = '+', on_delete = models.PROTECT )
+    banco = models.CharField( blank = True, null = True, max_length = 100 )
+    referencia = models.CharField( blank = True, null = True, max_length = 100 )
+    no_autorizacion = models.CharField( blank = True, null = True, max_length = 100 )
+    class Meta:
+        ordering = [ 'fecha_creacion', 'fecha_entrega', 'fecha_banco', 'identificador' ]
+    def __unicode__( self ):
+        return "{}".format( self.identificador )
+    def __str__( self ):
+        return self.__unicode__
+
 class Abono( models.Model ):
     idabono = models.AutoField( primary_key = True )
     fecha = models.DateField( default = date.today )
@@ -75,6 +92,7 @@ class Abono( models.Model ):
     monto = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     vendedor = models.ForeignKey( Usr, related_name = '+', on_delete = models.SET_NULL, null = True, limit_choices_to = { 'is_active' : True } )
     actualizable = models.BooleanField( default = True )
+    hoja_de_liquidacion =  models.ForeignKey( HojaLiquidacion, related_name = '+', on_delete = models.PROTECT, blank = True, null = True, default = None )
     class Meta:
         ordering = [ 'fecha', 'no_de_pago' ]
     def __unicode__( self ):

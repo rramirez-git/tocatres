@@ -1,0 +1,174 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block content %}
+
+<form method="post" enctype="application/x-www-form-urlencoded">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="col form-group">
+            <label for="fecha_inicio">Fecha Inicial:</label>
+            <input type="date" class="form-control" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio | date:'Y-m-d' }}" />
+        </div>
+        <div class="col form-group">
+            <label for="fecha_fin">Fecha Final:</label>
+            <input type="date" class="form-control" name="fecha_fin" id="fecha_fin" value="{{ fecha_fin | date:'Y-m-d' }}" />
+        </div>
+        <div class="col form-group">
+            <label for="idusrvendedor">Vendedor</label>
+            <select class="form-control" id="idusrvendedor" name="idusrvendedor">
+                <option value=""></option>
+                {% if encargados.gerentes %}
+                    <optgroup label="Gerentes">
+                        {% for item in encargados.gerentes %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+                {% if encargados.vendedores %}
+                    <optgroup label="Vendedores">
+                        {% for item in encargados.vendedores %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+            </select>
+        </div>
+        <div class="col form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-outline-secondary btn-block"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        </div>
+    </div>
+</form>
+
+{% if req_chart %}
+
+<div class="row">
+    <div class="col-sm-8">
+        <canvas id="grafico_reporte" style="width: 100%; height: 300px;"></canvas>
+    </div>
+    <div class="col-sm-4">
+
+        <table class="table table-striped table-sm table-responsive-md">
+            <thead>
+                <tr>
+                    <th>Mes</th>
+                    <th>Ventas</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    {% language 'en' %}
+                        <th class="text-right">$ {{ totales.ventas | intcomma }}</th>
+                    {% endlanguage %}
+                </tr>
+            </tfoot>
+            <tbody>
+                {% for reg in graph_regs %}
+                    <tr>
+                        <td>{{ reg.key }}</td>
+                        {% language 'en' %}
+                            <td class="text-right">$ {{ reg.value | intcomma }}</td>
+                        {% endlanguage %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    let dlabels = [];
+    let ddata = [];
+    let dmedia = [];
+    {% for reg in graph_regs %}
+        dlabels.push( '{{ reg.key }}' );
+        ddata.push( {{ reg.value }} );
+        dmedia.push( {{ reg.media }} );
+    {% endfor %}
+    let ctx = $( grafico_reporte )[ 0 ].getContext('2d');
+    let myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: dlabels,
+        datasets: [
+            {
+                lineTension : 0.25,
+                label : 'Ventas',
+                data : ddata
+            },
+            {
+                lineTension : 0.25,
+                label : 'Media Móvil',
+                data : dmedia,
+                fill : false,
+                borderColor : 'rgba( 40, 167, 69, 0.5 )',
+                backgroundColor : 'rgba( 40, 167, 69, 0.5 )'
+            }
+        ]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+{% endif %}
+
+<table class="table table-striped table-sm table-responsive-md">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            {% if show_vendedor %}
+                <th>Vendedor</th>
+            {% endif %}
+            <th>Fecha de Última Venta</th>
+            <th>Ventas</th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>
+                    <a href="{% url 'cargos_abonos_edocta' pk=reg.idusrcte %}">
+                        {{ reg.cte }}
+                    </a>
+                </td>
+                {% if show_vendedor %}
+                    <td>{{ reg.vend }}</td>
+                {% endif %}
+                <td>{{ reg.fecha }}</td>
+                {% language 'en' %}
+                    <td class="text-right">$ {{ reg.ventas | intcomma }}</td>
+                {% endlanguage %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            {% if show_vendedor %}
+                <th colspan="3">Total</th>
+            {% else %}
+                <th colspan="2">Total</th>
+            {% endif %}
+            {% language 'en' %}
+                <th class="text-right">$ {{ totales.ventas | intcomma }}</th>
+            {% endlanguage %}
+        </tr>
+    </tfoot>
+</table>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block content %}
+
+<table class="table table-striped table-sm table-responsive-md">
+    <thead>
+        <tr>
+            <th>Identificador</th>
+            <th>Fecha de Creación</th>
+            <th>Fecha de Entrega</th>
+            <th>Fecha de Depósito Bancario</th>
+            <th>Generada por</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="">
+        {% for reg in data %}
+            <tr>
+                <td>{{ reg.identificador }}</td>
+                <td>{{ reg.fecha_creacion }}</td>
+                <td>{{ reg.fecha_entrega }}</td>
+                <td>{% if reg.fecha_banco %}{{ reg.fecha_banco }}{% endif %}</td>
+                <td>{{ reg.generada_por }}</td>
+                {% language 'en' %}
+                    <td class="text-right">$ {{ reg.total | intcomma }}</td>
+                {% endlanguage %}
+                {% if can_see_det %}
+                    <td>
+                            <a title="Ver Detalle" href="{% url 'reporte_productos_det_hojliq' pk=reg.id %}" class="btn btn-outline-secondary">
+                                <i class="far fa-eye"></i>
+                            </a>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

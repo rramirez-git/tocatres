@@ -17,25 +17,11 @@ from .forms import *
 
 @valida_acceso( [ 'cliente.clientes_usuario' ] )
 def index( request ):
-    data = []
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'cliente.agregar_clientes_usuario' ):
         toolbar.append( { 'type' : 'link', 'view' : 'cliente_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
-        for gerente in Vendedor.get_Gerentes():
-            for cte in gerente.all_clientes():
-                data.append( cte )
-    else:
-        vendedor = Vendedor.get_from_usr( usuario )
-        if not vendedor is None:
-            for cte in vendedor.all_clientes():
-                data.append( cte )
-    decorado = [ ( tmpusr.compra_a, i, tmpusr ) for i, tmpusr in enumerate( data ) ]
-    decorado.sort()
-    data = [ tmpusr for compra_a, i, tmpusr in decorado ]
+    data = get_ctes_from_usr( usuario )
     return render(
         request,
         'buyersandsellers/cliente/index.html', {
@@ -190,3 +176,20 @@ def delete( request, pk ):
     except ProtectedError:
         return HttpResponseRedirect( reverse( 'seguridad_item_con_relaciones' ) )
     
+def get_ctes_from_usr( usuario ):
+    data = []
+    if usuario.is_superuser \
+            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
+            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+        for gerente in Vendedor.get_Gerentes():
+            for cte in gerente.all_clientes():
+                data.append( cte )
+    else:
+        vendedor = Vendedor.get_from_usr( usuario )
+        if not vendedor is None:
+            for cte in vendedor.all_clientes():
+                data.append( cte )
+    decorado = [ ( tmpusr.compra_a, i, tmpusr ) for i, tmpusr in enumerate( data ) ]
+    decorado.sort()
+    data = [ tmpusr for compra_a, i, tmpusr in decorado ]
+    return data

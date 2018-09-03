@@ -1,0 +1,91 @@
+{% extends "global/html_struct.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block content %}
+
+<form method="post" enctype="application/x-www-form-urlencoded">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="col form-group">
+            <label for="idusrvendedor">Vendedor</label>
+            <select class="form-control" id="idusrvendedor" name="idusrvendedor">
+                <option value=""></option>
+                {% if encargados.gerentes %}
+                    <optgroup label="Gerentes">
+                        {% for item in encargados.gerentes %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+                {% if encargados.vendedores %}
+                    <optgroup label="Vendedores">
+                        {% for item in encargados.vendedores %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+            </select>
+        </div>
+        <div class="col form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-outline-secondary btn-block"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-striped table-sm table-responsive-md">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            {% if show_vendedor %}
+                <th>Vendedor</th>
+            {% endif %}
+            <th>Fecha de Último Pago</th>
+            <th>Ventas</th>
+            <th>Pagos</th>
+            <th>Saldo</th>
+        </tr>
+    </thead>
+    <tbody id="data-tbl">
+        {% for reg in data %}
+            <tr>
+                <td>
+                    <a href="{% url 'cargos_abonos_edocta' pk=reg.idusrcte %}">
+                        {{ reg.cte }}
+                    </a>
+                </td>
+                {% if show_vendedor %}
+                    <td>{{ reg.vend }}</td>
+                {% endif %}
+                <td>{{ reg.fecha }}</td>
+                {% language 'en' %}
+                    <td class="text-right">$ {{ reg.ventas | intcomma }}</td>
+                    <td class="text-right">$ {{ reg.pagos | intcomma }}</td>
+                    <td class="text-right">$ {{ reg.saldo | intcomma }}</td>
+                {% endlanguage %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            {% if show_vendedor %}
+                <th colspan="2">Total</th>
+            {% else %}
+                <th>Total</th>
+            {% endif %}
+            <td>Recuperación: <strong>{{ totales.recuperacion }} %</strong></td>
+            {% language 'en' %}
+                <th class="text-right">$ {{ totales.ventas | intcomma }}</th>
+                <th class="text-right">$ {{ totales.pagos | intcomma }}</th>
+                <th class="text-right">$ {{ totales.saldo | intcomma }}</th>
+            {% endlanguage %}
+        </tr>
+    </tfoot>
+</table>
+
+{% endblock %}
