@@ -37,8 +37,8 @@
                 <td>{{ reg.categoria }}</td>
                 {% if perms.productos.administrar_precios_producto %}
                     {% language 'en' %}
-                    <td>$ {{ reg.precio_de_compra | intcomma }}</td>
-                    <td>$ {{ reg.precio_de_venta | intcomma }}</td>
+                    <td class="text-right">{{ reg.precio_de_compra | intcomma }}</td>
+                    <td class="text-right">{{ reg.precio_de_venta | intcomma }}</td>
                     {% endlanguage %}
                 {% endif %}
                 <td>

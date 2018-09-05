@@ -25,7 +25,7 @@
                 <td>{% if reg.fecha_banco %}{{ reg.fecha_banco }}{% endif %}</td>
                 <td>{{ reg.generada_por }}</td>
                 {% language 'en' %}
-                    <td class="text-right">$ {{ reg.total | intcomma }}</td>
+                    <td class="text-right">{{ reg.total | intcomma }}</td>
                 {% endlanguage %}
                 {% if can_see_det %}
                     <td>

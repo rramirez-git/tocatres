@@ -94,7 +94,7 @@
                 <td>{{ p.concepto }}</td>
                 <td>{{ p.fecha }}</td>
                 {% language 'en' %}
-                    <td class="text-right">$ {{ p.monto | intcomma }}</td>
+                    <td class="text-right">{{ p.monto | intcomma }}</td>
                 {% endlanguage %}
             </tr>
         {% endfor %}
@@ -103,7 +103,7 @@
         <tr>
             <th colspan="4">Total</th>
             {% language 'en' %}
-                <th class="text-right">$ {{ total | intcomma }}</th>
+                <th class="text-right">{{ total | intcomma }}</th>
             {% endlanguage %}
 </table>
 

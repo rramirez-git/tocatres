@@ -65,7 +65,7 @@
                 <tr>
                     <th>Total</th>
                     {% language 'en' %}
-                        <th class="text-right">$ {{ totales.ventas | intcomma }}</th>
+                        <th class="text-right">{{ totales.ventas | intcomma }}</th>
                     {% endlanguage %}
                 </tr>
             </tfoot>
@@ -74,7 +74,7 @@
                     <tr>
                         <td>{{ reg.key }}</td>
                         {% language 'en' %}
-                            <td class="text-right">$ {{ reg.value | intcomma }}</td>
+                            <td class="text-right">{{ reg.value | intcomma }}</td>
                         {% endlanguage %}
                     </tr>
                 {% endfor %}
@@ -152,7 +152,7 @@
                 {% endif %}
                 <td>{{ reg.fecha }}</td>
                 {% language 'en' %}
-                    <td class="text-right">$ {{ reg.ventas | intcomma }}</td>
+                    <td class="text-right">{{ reg.ventas | intcomma }}</td>
                 {% endlanguage %}
             </tr>
         {% endfor %}
@@ -165,7 +165,7 @@
                 <th colspan="2">Total</th>
             {% endif %}
             {% language 'en' %}
-                <th class="text-right">$ {{ totales.ventas | intcomma }}</th>
+                <th class="text-right">{{ totales.ventas | intcomma }}</th>
             {% endlanguage %}
         </tr>
     </tfoot>

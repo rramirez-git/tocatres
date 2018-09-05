@@ -3,6 +3,8 @@
 {% load i18n %}
 {% block content %}
 
+<!-- ExtraData -->
+
 {% for llave, valor in extra.items %}
 <p><strong>{{ llave }}</strong>: {{valor}}</p>
 {% endfor %}
@@ -11,7 +13,7 @@
 
 {% if saldo %}
 
-    <p class="lead">Tu saldo es de <a href="{% url 'mi_saldo' %}">$ {% language 'en' %}{{ saldo | intcomma }}{% endlanguage %}</a>.</p>
+    <p class="lead">Tu saldo es de <a href="{% url 'mi_saldo' %}">{% language 'en' %}{{ saldo | intcomma }}{% endlanguage %}</a>.</p>
 
 {% endif %}
 

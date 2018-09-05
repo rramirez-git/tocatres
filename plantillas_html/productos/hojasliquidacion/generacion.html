@@ -85,7 +85,7 @@
                     <td>{{ reg.concepto }}</td>
                     <td>{{ reg.fecha }}</td>
                     {% language 'en' %}
-                        <td class="text-right">$ {{ reg.monto | intcomma }}</td>
+                        <td class="text-right">{{ reg.monto | intcomma }}</td>
                     {% endlanguage %}
                     <td>
                         <input onchange="Prod.sumTotalHL()" name="idpago" value="{{ reg.idpago }}" data-monto="{{ reg.monto }}" class="" type="checkbox" />
@@ -100,7 +100,7 @@
                 {% else %}
                     <th colspan="4">Total</th>
                 {% endif %}
-                <th class="text-right">$ <span id="total">0</span></th>
+                <th class="text-right"><span id="total">0</span></th>
                 <th></th>
             </tr>
         </tfoot>

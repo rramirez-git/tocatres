@@ -7,7 +7,7 @@
 <p class="lead">
     Saldo Acual: 
     {% language 'en' %}
-        ${{ saldo | intcomma }}
+        {{ saldo | intcomma }}
     {% endlanguage %}
 </p>
 
@@ -18,9 +18,9 @@
             <div class="float-right">
                 {% language 'en' %}
                     {% if mov.cargo %}
-                        <span class="text-primary">$ - {{ mov.monto | intcomma }} </span>
+                        <span class="text-primary">- {{ mov.monto | intcomma }} </span>
                     {% else %}
-                        $ {{ mov.monto | intcomma }}
+                        {{ mov.monto | intcomma }}
                     {% endif %}
                 {% endlanguage %}
             </div>

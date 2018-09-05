@@ -64,9 +64,9 @@
                 {% endif %}
                 <td>{{ reg.fecha }}</td>
                 {% language 'en' %}
-                    <td class="text-right">$ {{ reg.ventas | intcomma }}</td>
-                    <td class="text-right">$ {{ reg.pagos | intcomma }}</td>
-                    <td class="text-right">$ {{ reg.saldo | intcomma }}</td>
+                    <td class="text-right">{{ reg.ventas | intcomma }}</td>
+                    <td class="text-right">{{ reg.pagos | intcomma }}</td>
+                    <td class="text-right">{{ reg.saldo | intcomma }}</td>
                 {% endlanguage %}
             </tr>
         {% endfor %}
@@ -80,9 +80,9 @@
             {% endif %}
             <td>Recuperación: <strong>{{ totales.recuperacion }} %</strong></td>
             {% language 'en' %}
-                <th class="text-right">$ {{ totales.ventas | intcomma }}</th>
-                <th class="text-right">$ {{ totales.pagos | intcomma }}</th>
-                <th class="text-right">$ {{ totales.saldo | intcomma }}</th>
+                <th class="text-right">{{ totales.ventas | intcomma }}</th>
+                <th class="text-right">{{ totales.pagos | intcomma }}</th>
+                <th class="text-right">{{ totales.saldo | intcomma }}</th>
             {% endlanguage %}
         </tr>
     </tfoot>

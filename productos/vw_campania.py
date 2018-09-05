@@ -165,7 +165,7 @@ def novedades( request ):
     #     for p in c.productos.all():
     #         if 0 == productos.count( p ):
     #             productos.append( p )
-    for p in Producto.objects.all():
+    for p in Producto.objects.filter( esta_activo = True ):
         productos.append( p )
     #shuffle( productos )
     return render( request, 'productos/campania/novedades.html', {
