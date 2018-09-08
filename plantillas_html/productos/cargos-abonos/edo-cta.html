@@ -14,7 +14,7 @@
 {% for mov in movs %}
     <div class="movimiento">
         <div class="clearfix">
-            <div class="float-left text-muted">{{ mov.fecha }}</div>
+            <div class="float-left text-muted">{{ mov.fecha | date:"d/m/Y" }}</div>
             <div class="float-right">
                 {% language 'en' %}
                     {% if mov.cargo %}

@@ -92,7 +92,7 @@
                 <td>{{ p.cargo.cliente }}</td>
                 <td>{{ p.no_de_pago }}</td>
                 <td>{{ p.concepto }}</td>
-                <td>{{ p.fecha }}</td>
+                <td>{{ p.fecha | date:"d/m/Y" }}</td>
                 {% language 'en' %}
                     <td class="text-right">{{ p.monto | intcomma }}</td>
                 {% endlanguage %}

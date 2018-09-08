@@ -4,9 +4,11 @@
 
 <!-- <div class="card" onclick="location.href='{% url 'campaña_novedades_producto' pk=prod.pk mp=mostrar_precio %}'"> -->
 <div class="card">
-    <img class="card-img-top" src="{{ MEDIA_URL }}{{ prod.imagen }}" title="{{ prod.nombre }}" data-toggle="tooltip" />
+    {% if prod.imagen %}
+        <img class="card-img-top" src="{{ MEDIA_URL }}{{ prod.imagen }}" title="{{ prod.nombre }}" data-toggle="tooltip" />
+    {% endif %}
     <div class="card-body">
-        {% if prod.nombre %}<h5 class="card-title">{{ prod.nombre }}</h5>{% endif %}
+        {% if prod.nombre %}<h5 class="card-title">{{ prod }}</h5>{% endif %}
         {% if prod.descripcion %}
             <p class="card-text">
                 <small>{{ prod.descripcion | as_paragraph | safe }}</small>

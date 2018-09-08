@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group, User
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, Q
 from django.conf import settings
 from random import randint
 from os.path import isfile
@@ -18,6 +18,13 @@ from .forms import *
 @valida_acceso( [ 'cliente.clientes_usuario' ] )
 def index( request ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
+    if "POST" == request.method:
+        for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_admin_id' ) ) ):
+            prod.is_active = False
+            prod.save()
+        for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_activo_id' ) ) ):
+            prod.is_active = True
+            prod.save()
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'cliente.agregar_clientes_usuario' ):
         toolbar.append( { 'type' : 'link', 'view' : 'cliente_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
@@ -189,7 +196,7 @@ def get_ctes_from_usr( usuario ):
         if not vendedor is None:
             for cte in vendedor.all_clientes():
                 data.append( cte )
-    decorado = [ ( tmpusr.compra_a, i, tmpusr ) for i, tmpusr in enumerate( data ) ]
+    decorado = [ ( not tmpusr.is_active, tmpusr.compra_a, i, tmpusr ) for i, tmpusr in enumerate( data ) ]
     decorado.sort()
-    data = [ tmpusr for compra_a, i, tmpusr in decorado ]
+    data = [ tmpusr for is_active, compra_a, i, tmpusr in decorado ]
     return data

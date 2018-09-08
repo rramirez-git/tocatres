@@ -24,8 +24,8 @@
                 <td><input type="checkbox" disabled="disabled" {% if reg.is_active %}checked="checked"{% endif %} /></td>
                 <td><input type="checkbox" disabled="disabled" {% if reg.is_staff %}checked="checked"{% endif %} /></td>
                 <td><input type="checkbox" disabled="disabled" {% if reg.is_superuser %}checked="checked"{% endif %} /></td>
-                <td>{{ reg.date_joined }}</td>
-                <td>{{ reg.last_login }}</td>
+                <td>{{ reg.date_joined | date:"d/m/Y" }}</td>
+                <td>{{ reg.last_login | date:"d/m/Y" }}</td>
             </tr>
         {% endfor %}
     </tbody>

@@ -71,12 +71,14 @@
             </tfoot>
             <tbody>
                 {% for reg in graph_regs %}
+                    {% if reg.value %}
                     <tr>
                         <td>{{ reg.key }}</td>
                         {% language 'en' %}
                             <td class="text-right">{{ reg.value | intcomma }}</td>
                         {% endlanguage %}
                     </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -135,12 +137,13 @@
             {% if show_vendedor %}
                 <th>Vendedor</th>
             {% endif %}
-            <th>Fecha de Última Venta</th>
+            <th>Última Venta</th>
             <th>Ventas</th>
         </tr>
     </thead>
     <tbody id="data-tbl">
         {% for reg in data %}
+            {% if reg.ventas %}
             <tr>
                 <td>
                     <a href="{% url 'cargos_abonos_edocta' pk=reg.idusrcte %}">
@@ -150,11 +153,12 @@
                 {% if show_vendedor %}
                     <td>{{ reg.vend }}</td>
                 {% endif %}
-                <td>{{ reg.fecha }}</td>
+                <td>{{ reg.fecha | date:"d/m/Y" }}</td>
                 {% language 'en' %}
                     <td class="text-right">{{ reg.ventas | intcomma }}</td>
                 {% endlanguage %}
             </tr>
+            {% endif %}
         {% endfor %}
     </tbody>
     <tfoot>

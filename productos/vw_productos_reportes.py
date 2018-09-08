@@ -32,6 +32,8 @@ def saldos( request ):
         'saldo' : Decimal( 0.0 ), 
         'recuperacion' : Decimal( 0.0 ) 
     }
+    rec_vta = Decimal( 0.0 )
+    rec_pag = Decimal( 0.0 )
     for cte in ctes:
         ventas = Decimal( 0.0 )
         saldo = Decimal( 0.0 )
@@ -42,6 +44,9 @@ def saldos( request ):
             for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha ):
                 if fecha < pago.fecha:
                     fecha = pago.fecha
+            if vta.saldo() > 0:
+                rec_vta += vta.monto
+                rec_pag += ( vta.monto - vta.saldo() )
         if datetime.date( 2000, 1, 1 ) == fecha:
             fecha = "Sin Pagos"
         pagos = ventas - saldo
@@ -59,7 +64,7 @@ def saldos( request ):
             'saldo'     : saldo,
             'fecha'     : fecha
         } )
-    totales[ 'recuperacion' ] = "{:02.2f}".format( totales[ 'pagos' ] * Decimal( 100.0 ) / totales[ 'ventas' ] )
+    totales[ 'recuperacion' ] = "{:02.0f}".format( rec_pag * Decimal( 100.0 ) / rec_vta )
     return render(
         request,
         'productos/reportes/saldos.html', {

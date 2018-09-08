@@ -11,6 +11,7 @@ from tocatres.utils import requires_jquery_ui
 
 @valida_acceso( [ 'cargo.ventas_y_pagos_cargo' ] )
 def index( request ):
+    mensaje = None
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     if 'POST' == request.method:
         cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
@@ -25,6 +26,7 @@ def index( request ):
                 cliente = cte,
                 vendedor = usuario
             )
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la venta de {} a {}".format( prod, cte ) }
         elif 'addpayment' == request.POST.get( 'action' ):
             cargo = Cargo.objects.get( pk = request.POST.get( 'cargo' ) )
             Abono.objects.create(
@@ -35,6 +37,7 @@ def index( request ):
                 cargo = cargo,
                 vendedor = usuario
             )
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado el pago {} de {} a {}".format( request.POST.get( 'no_de_pago' ), request.POST.get( 'concepto_abono' ), cargo.cliente ) }
             cargo.actualizable = False
             if cargo.saldo() <= 0:
                 cargo.saldado = True
@@ -43,7 +46,6 @@ def index( request ):
                 for abono in Abono.objects.filter( cargo = cargo ):
                     abono.actualizable = False
                     abono.save()
-        return HttpResponseRedirect( reverse( 'cargos_abonos_edocta', kwargs = { 'pk' : cte.pk } ) )
     my_clients = []
     all_clients = []
     if usuario.groups.all().filter( name__icontains = 'Administrador' ).exists() \
@@ -67,7 +69,8 @@ def index( request ):
             'my_clients' : sorted( my_clients, key = attrgetter( 'first_name', 'last_name' ) ),
             'all_clients' : sorted( all_clients, key = attrgetter( 'first_name', 'last_name' ) ),
             'products' : Producto.objects.filter( esta_activo = True ),
-            'req_ui' : requires_jquery_ui( request )
+            'req_ui' : requires_jquery_ui( request ),
+            'mensaje' : mensaje
     } )
 
 @valida_acceso( [ 'cargo.ventas_y_pagos_cargo' ] )

@@ -20,9 +20,9 @@
         {% for reg in data %}
             <tr>
                 <td>{{ reg.identificador }}</td>
-                <td>{{ reg.fecha_creacion }}</td>
-                <td>{{ reg.fecha_entrega }}</td>
-                <td>{% if reg.fecha_banco %}{{ reg.fecha_banco }}{% endif %}</td>
+                <td>{{ reg.fecha_creacion | date:"d/m/Y" }}</td>
+                <td>{{ reg.fecha_entrega | date:"d/m/Y" }}</td>
+                <td>{% if reg.fecha_banco %}{{ reg.fecha_banco | date:"d/m/Y" }}{% endif %}</td>
                 <td>{{ reg.generada_por }}</td>
                 {% language 'en' %}
                     <td class="text-right">{{ reg.total | intcomma }}</td>

@@ -83,7 +83,7 @@
                     {% endif %}
                     <td>{{ reg.no }}</td>
                     <td>{{ reg.concepto }}</td>
-                    <td>{{ reg.fecha }}</td>
+                    <td>{{ reg.fecha | date:"d/m/Y" }}</td>
                     {% language 'en' %}
                         <td class="text-right">{{ reg.monto | intcomma }}</td>
                     {% endlanguage %}

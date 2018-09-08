@@ -45,7 +45,7 @@
             {% if show_vendedor %}
                 <th>Vendedor</th>
             {% endif %}
-            <th>Fecha de Último Pago</th>
+            <th>Último Pago</th>
             <th>Ventas</th>
             <th>Pagos</th>
             <th>Saldo</th>
@@ -62,7 +62,7 @@
                 {% if show_vendedor %}
                     <td>{{ reg.vend }}</td>
                 {% endif %}
-                <td>{{ reg.fecha }}</td>
+                <td>{{ reg.fecha | date:"d/m/Y" }}</td>
                 {% language 'en' %}
                     <td class="text-right">{{ reg.ventas | intcomma }}</td>
                     <td class="text-right">{{ reg.pagos | intcomma }}</td>
@@ -78,7 +78,7 @@
             {% else %}
                 <th>Total</th>
             {% endif %}
-            <td>Recuperación: <strong>{{ totales.recuperacion }} %</strong></td>
+            <td>Recuperado: <strong>{{ totales.recuperacion }} %</strong></td>
             {% language 'en' %}
                 <th class="text-right">{{ totales.ventas | intcomma }}</th>
                 <th class="text-right">{{ totales.pagos | intcomma }}</th>

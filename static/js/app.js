@@ -1,3 +1,28 @@
+Date.prototype.asMySQL = function() {
+    let res = "" + this.getFullYear() + "-";
+    if( this.getMonth() < 9 ) {
+        res += "0";
+    }
+    res += ( this.getMonth() + 1 ) + "-";
+    if( this.getDate() < 10 ) {
+        res += "0";
+    }
+    res += this.getDate();
+    return res;
+}
+Date.prototype.asMx = function() {
+    let res = "";
+    if( this.getDate() < 10 ) {
+        res += "0";
+    }
+    res += this.getDate() + "/";
+    if( this.getMonth() < 9 ) {
+        res += "0";
+    }
+    res += ( this.getMonth() + 1 ) + "/" + this.getFullYear();
+    return res;
+}
+
 class clsApp {
     inputFileOpen(  ) {
         let iframe_url = uploader.url + "?";
@@ -22,47 +47,58 @@ class clsApp {
     }
     openPanel( body, title, close = true, footer = null ) {
         let template = Handlebars.compile( $( "#modal-panel-message-template" ).html() );
-        let context = {title: "Cargar Archivo", body: ' ', close: "yes" };
         let html = template( { "title" : title, "body" : body, "footer" : footer, "close" : close } );
+        $( "#modal-panel-message" ).remove();
         $( document.body ).append( $( html ) );
         $( "#modal-panel-message" ).modal();
     }
 }
 
 class clsProd {
-    hideFormsMovs() {
-        $( "#aplicar-cargo" ).addClass( 'd-none' );
-        $( "#aplicar-abono" ).addClass( 'd-none' );
-    }
-    showChargeForm() {
-        this.hideFormsMovs();
-        $( "#aplicar-cargo" ).removeClass( 'd-none' );
+    showChargeForm( idcte ) {
+        let template = Handlebars.compile( $( "#aplicar-cargo-template").html() );
+        let context = { cte : idcte, today : ( new Date() ).asMySQL(), prods : productos };
+        let html = template( context );
+        App.openPanel( html, "Aplicar Venta" );
     }
     setChargeInfo() {
         let idprod = $( "#product" ).val();
-        let prod = $( '#product option[value=' + idprod + ']' ).text().split( '/' );
-        prod = prod[ prod.length - 1 ].trim();
-        $( "#monto_cargo" ).attr( 'value', montos[ idprod ] );
-        $( "#concepto_cargo" ).attr( 'value', prod );
+        let prod = null;
+        for( let idx = 0; idx < productos.length; idx++ ) {
+            if( productos[ idx ].pk == idprod ) {
+                prod = productos[ idx ];
+                break;
+            }
+        }
+        if( prod ) {
+            $( "#monto_cargo" ).attr( 'value', prod.precio );    
+            $( "#concepto_cargo" ).attr( 'value', prod.nombre );
+        }
     }
-    setChargeClientId() {
-        $( '#aplicar-cargo input[name="cte"]' ).attr( 'value', $( "#client" ).val() )
-        return true;
-    }
-    showPaymentForm() {
-        this.hideFormsMovs()
-        let idcte = $( "#client" ).val()
+    showPaymentForm( idcte ) {
         $.getJSON( BASE_URL + '/movimientos/ventas/' + idcte + '/', ( movs ) => {
-            console.log( movs );
-            if( 0 == movs.charges.length ) {
-                alert( "El cliente no tiene cargos con saldo" );
+            let cont = 0;
+            for( let idx in movs.charges ) {
+                if( parseFloat( movs.charges[ idx ].saldo ) > 0.0 ) {
+                    cont++;
+                    break;
+                }
+            }
+            if( 0 == movs.charges.length || ! cont ) {
+                App.openPanel(  "El cliente no tiene cargos con saldo", "Mensaje de Sistema" );
                 return false;
             }
+            let template = Handlebars.compile( $( "#aplicar-abono-template").html() );
+            let context = { cte : idcte, today : ( new Date() ).asMySQL() };
+            let html = template( context );
+            App.openPanel( html, "Aplicar Pago" );
             $( "#cargo option" ).remove();
+            $( "#concepto_abono" ).attr( 'value', '' );
+            $( "#monto_abono" ).attr( 'value', '' );
             $( "#cargo" ).append( $( `<option></option>` ) );
             for( let idx in movs.charges ) {
                 if( parseFloat( movs.charges[ idx ].saldo ) > 0.0 )
-                $( "#cargo" ).append( $( `<option value="${movs.charges[ idx ].id}" data-saldo="${movs.charges[ idx ].saldo}">${movs.charges[ idx ].cargo}</option>` ) );
+                    $( "#cargo" ).append( $( `<option value="${movs.charges[ idx ].id}" data-saldo="${movs.charges[ idx ].saldo}">${movs.charges[ idx ].cargo}</option>` ) );
             }
             $( "#no_de_pago" ).attr( 'value', movs.no_abono );
             $( "#aplicar-abono" ).removeClass( 'd-none' );
@@ -73,7 +109,7 @@ class clsProd {
         let idcargo = $( "#cargo" ).val();
         let cargo = $( `#cargo option[value="${idcargo}"]` ).text().trim();
         $( "#concepto_abono" ).attr( 'value', concepto + cargo );
-        $( "#monto_abono" ).attr( 'value', $( `#cargo option[value="${idcargo}"]` ).attr( 'data-saldo' ) )
+        $( "#monto_abono" ).attr( 'value', $( `#cargo option[value="${idcargo}"]` ).attr( 'data-saldo' ) );
     }
     verifyPaymentInfo() {
         $( '#aplicar-abono input[name="cte"]' ).attr( 'value', $( "#client" ).val() )
@@ -91,9 +127,6 @@ class clsProd {
             return false;
         }
         return true;
-    }
-    showAcc() {
-        location.href = BASE_URL + '/movimientos/' + $( "#client" ).val();
     }
     sumTotalHL() {
         let suma = 0.0;

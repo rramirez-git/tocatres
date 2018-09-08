@@ -21,7 +21,20 @@ class Producto( models.Model ):
     class Meta:
         ordering = [ '-esta_activo', 'sku', 'categoria', 'marca', 'modelo', 'nombre' ]
     def __unicode__( self ):
-        return "{} / {} / {}".format( self.categoria, self.marca, self.nombre )
+        name = ""
+        if self.nombre:
+            name = self.nombre
+        if self.marca:
+            if "" != name:
+                name += " " + self.marca
+            else:
+                name += self.marca
+        if self.modelo:
+            if "" != name:
+                name += " " + self.modelo
+            else:
+                name += self.modelo
+        return name
     def __str__( self ):
         return self.__unicode__()
 

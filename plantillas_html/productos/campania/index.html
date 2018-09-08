@@ -14,8 +14,8 @@
         {% for reg in data %}
             <tr>
                 <td>{{ reg.nombre }}</td>
-                <td>{{ reg.fecha_de_inicio }}</td>
-                <td>{{ reg.fecha_de_termino }}</td>
+                <td>{{ reg.fecha_de_inicio | date:"d/m/Y" }}</td>
+                <td>{{ reg.fecha_de_termino | date:"d/m/Y" }}</td>
                 <td class="text-center">
                     {% if perms.productos.campanas_campaña %}
                     <a href="{% url 'campaña_ver' pk=reg.pk %}" class="btn btn-outline-secondary" title="Ver"><i class="far fa-eye"></i></a>
