@@ -13,10 +13,7 @@ from tocatres.utils import requires_jquery_ui, month_name
 def saldos( request ):
     show_vendedor = False
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Gerente" ).exists():
+    if usuario.is_admin():
         show_vendedor = True
     actual = 0
     if "POST" == request.method and "" != request.POST.get( 'idusrvendedor' ):
@@ -82,10 +79,7 @@ def saldos( request ):
 def ventas( request ):
     show_vendedor = False
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Gerente" ).exists():
+    if usuario.is_admin():
         show_vendedor = True
     actual = 0
     data = []
@@ -160,10 +154,7 @@ def ventas( request ):
 def pagos( request ):
     show_vendedor = False
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Gerente" ).exists():
+    if usuario.is_admin():
         show_vendedor = True
     actual = 0
     data = []
@@ -240,10 +231,7 @@ def genHojasLiquidacion( request ):
     mensaje = None
     show_vendedor = False
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Gerente" ).exists():
+    if usuario.is_admin():
         show_vendedor = True
     actual = 0
     today = datetime.date.today()
@@ -394,9 +382,7 @@ def detalleHojaLiquidación( request, pk ):
 
 def get_encardados( usr ):
     usuario = usr
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+    if usuario.is_admin():
         show_vendedor = True
         gerentes = Vendedor.get_Gerentes()
         vendedores = Vendedor.get_Vendedores()

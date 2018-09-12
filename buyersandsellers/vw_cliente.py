@@ -12,23 +12,80 @@ from operator import attrgetter
 
 from seguridad.mkitsafe import *
 from seguridad.models import Usr
+from productos.models import movimientos, Producto, Cargo, Abono
+from tocatres.utils import *
 
 from .forms import *
 
 @valida_acceso( [ 'cliente.clientes_usuario' ] )
 def index( request ):
+    mensaje = None
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     if "POST" == request.method:
-        for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_admin_id' ) ) ):
-            prod.is_active = False
-            prod.save()
-        for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_activo_id' ) ) ):
-            prod.is_active = True
-            prod.save()
+        if "activate_deactivate_clients" == request.POST.get( 'action' ):
+            for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_admin_id' ) ) ):
+                prod.is_active = False
+                prod.save()
+            for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_activo_id' ) ) ):
+                prod.is_active = True
+                prod.save()
+            mensaje = { 'type' : 'success', 'msg' : "Clientes actualizados" }
+        elif 'addcharge' == request.POST.get( 'action' ):
+            cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
+            prod = Producto.objects.get( pk = request.POST.get( 'product' ) )
+            Cargo.objects.create(
+                fecha = request.POST.get( 'fecha_cargo' ),
+                factura = request.POST.get( 'factura' ),
+                concepto = request.POST.get( 'concepto_cargo' ),
+                monto = request.POST.get( 'monto_cargo' ),
+                producto = prod,
+                cliente = cte,
+                vendedor = usuario
+            )
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la venta de {} a {}".format( prod, cte ) }
+        elif 'addpayment' == request.POST.get( 'action' ):
+            cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
+            cargo = Cargo.objects.get( pk = request.POST.get( 'cargo' ) )
+            Abono.objects.create(
+                fecha = request.POST.get( 'fecha_abono' ),
+                no_de_pago = request.POST.get( 'no_de_pago' ),
+                concepto = request.POST.get( 'concepto_abono' ),
+                monto = request.POST.get( 'monto_abono' ),
+                cargo = cargo,
+                vendedor = usuario
+            )
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado el pago {} de {} a {}".format( request.POST.get( 'no_de_pago' ), request.POST.get( 'concepto_abono' ), cargo.cliente ) }
+            cargo.actualizable = False
+            if cargo.saldo() <= 0:
+                cargo.saldado = True
+            cargo.save()
+            if cargo.saldado:
+                for abono in Abono.objects.filter( cargo = cargo ):
+                    abono.actualizable = False
+                    abono.save()
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'cliente.agregar_clientes_usuario' ):
         toolbar.append( { 'type' : 'link', 'view' : 'cliente_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
-    data = get_ctes_from_usr( usuario )
+    ctes = get_ctes_from_usr( usuario )
+    data = []
+    for cte in ctes:
+        movs = movimientos( cte )
+        data.append( {
+            'pk' : cte.pk,
+            'usrid' : cte.idusuario,
+            'fotografia' : cte.fotografia,
+            'clave' : cte.clave,
+            'nombre' : cte.get_full_name(),
+            'compra_a' : cte.compra_a,
+            'email' : cte.email,
+            'celular' : cte.celular,
+            'telefono' : cte.telefono,
+            'is_active' : cte.is_active,
+            'ventas' : movs[ 'ventas' ],
+            'saldo' : movs[ 'saldo' ],
+            'pagos' : movs[ 'pagos' ],
+            'ult_pag' : movs[ 'ultimo_pago' ]
+        } )
     return render(
         request,
         'buyersandsellers/cliente/index.html', {
@@ -36,7 +93,10 @@ def index( request ):
             'footer' : True,
             'titulo' : 'Clientes',
             'data' : data,
-            'toolbar' : toolbar
+            'toolbar' : toolbar,
+            'products' : Producto.objects.filter( esta_activo = True ),
+            'req_ui' : requires_jquery_ui( request ),
+            'mensaje' : mensaje
         } )
     
 @valida_acceso( [ 'cliente.agregar_clientes_usuario' ] )
@@ -185,9 +245,7 @@ def delete( request, pk ):
     
 def get_ctes_from_usr( usuario ):
     data = []
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+    if usuario.is_admin():
         for gerente in Vendedor.get_Gerentes():
             for cte in gerente.all_clientes():
                 data.append( cte )

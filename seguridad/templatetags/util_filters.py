@@ -20,3 +20,7 @@ def as_paragraph( text ):
         if "" != p.strip():
             pars.append( '<p>{}</p>'.format( p.strip() ) ) 
     return "".join( pars )
+
+@register.filter
+def random_num( num_ini, num_fin ):
+    return "{:3d}".format( randint( num_ini, num_fin ) )

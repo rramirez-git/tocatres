@@ -131,9 +131,7 @@ def assign( request ):
         campaña.save()
         msg = "Campaña Asignada correctamente."
     data = { 'misclientes' : [], 'misvendedores' : [], 'clientes' : [] }
-    if usuario.groups.all().filter( name__icontains = 'Administrador' ).exists() \
-            or usuario.groups.all().filter( name__icontains = 'Super-Administrador' ).exists() \
-            or usuario.is_superuser:
+    if usuario.is_admin():
         desc = Usr.objects.all()
     else:
         desc = usuario.descendencia()

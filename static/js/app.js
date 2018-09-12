@@ -60,6 +60,13 @@ class clsProd {
         let context = { cte : idcte, today : ( new Date() ).asMySQL(), prods : productos };
         let html = template( context );
         App.openPanel( html, "Aplicar Venta" );
+        if( req_ui ) {
+            $( `input[type="date"]` ).datepicker( {
+                changeMonth: true,
+                changeYear: true,
+                dateFormat : 'yy-mm-dd'  
+            } );
+        }
     }
     setChargeInfo() {
         let idprod = $( "#product" ).val();
@@ -101,7 +108,13 @@ class clsProd {
                     $( "#cargo" ).append( $( `<option value="${movs.charges[ idx ].id}" data-saldo="${movs.charges[ idx ].saldo}">${movs.charges[ idx ].cargo}</option>` ) );
             }
             $( "#no_de_pago" ).attr( 'value', movs.no_abono );
-            $( "#aplicar-abono" ).removeClass( 'd-none' );
+            if( req_ui ) {
+                $( `input[type="date"]` ).datepicker( {
+                    changeMonth: true,
+                    changeYear: true,
+                    dateFormat : 'yy-mm-dd'  
+                } );
+            }
         } );
     }
     setPaymentInfo() {

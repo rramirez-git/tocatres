@@ -107,6 +107,7 @@ class RegClienteIn( forms.ModelForm ):
         fields = [ 
             'usuario', 
             'contraseña', 
+            'clave',
             'is_active', 
             'first_name', 
             'last_name', 
@@ -134,6 +135,7 @@ class RegCliente( forms.ModelForm ):
         model = Cliente
         fields = [ 
             'usuario', 
+            'clave',
             'is_active', 
             'first_name', 
             'last_name', 

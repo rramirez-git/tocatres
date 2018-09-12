@@ -1,4 +1,5 @@
 {% load static %}
+{% load util_filters %}
 <!DOCTYPE html>
 <html lang="es">
 	<head>
@@ -17,8 +18,8 @@
 		{% if req_ui %}
 		<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" />
 		{% endif %}
-		<link rel="icon" href="{% static "img/favicon.png" %}" type="image/png" />
-		<link rel="stylesheet" href="{% static "css/styles.css" %}" />
+		<link rel="icon" href="{% static 'img/favicon.png' %}" type="image/png" />
+		<link rel="stylesheet" href="{% static 'css/styles.css' %}?rn={{ 1 | random_num:99999999 }}" />
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -32,7 +33,7 @@
 		{% if req_chart %}
 		<script type="text/javascript" src="{% static 'js/chart-272.min.js' %}"></script>
 		{% endif %}
-		<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/app.js' %}?rn={{ 1 | random_num:99999999 }}"></script>
 		<script type="text/javascript">
 			let BASE_URL = '//{{ request.get_host }}'
 		</script>

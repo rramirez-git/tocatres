@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from decimal import Decimal
 
 from buyersandsellers.models import *
 from seguridad.models import *
@@ -57,7 +58,7 @@ class Cargo( models.Model ):
     idcargo = models.AutoField( primary_key = True )
     fecha = models.DateField( default = date.today )
     factura = models.CharField( blank = False, max_length = 20 )
-    producto = models.ForeignKey( Producto, related_name = '+', on_delete = models.PROTECT, null = True, limit_choices_to =  { 'esta_activo' : True } )
+    producto = models.ForeignKey( Producto, related_name = '+', on_delete = models.SET_NULL, null = True, limit_choices_to =  { 'esta_activo' : True } )
     concepto = models.CharField( blank = False, max_length = 150 )
     monto = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     cliente = models.ForeignKey( Usr, related_name = '+', on_delete = models.PROTECT, limit_choices_to = { 'is_active' : True } )
@@ -100,12 +101,12 @@ class Abono( models.Model ):
     idabono = models.AutoField( primary_key = True )
     fecha = models.DateField( default = date.today )
     no_de_pago = models.PositiveSmallIntegerField( default = 1, blank = False )
-    cargo = models.ForeignKey( Cargo, related_name = '+', on_delete = models.PROTECT, limit_choices_to = { 'saldado' : False } )
+    cargo = models.ForeignKey( Cargo, related_name = '+', on_delete = models.CASCADE, limit_choices_to = { 'saldado' : False } )
     concepto = models.CharField( blank = False, max_length = 150 )
     monto = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     vendedor = models.ForeignKey( Usr, related_name = '+', on_delete = models.SET_NULL, null = True, limit_choices_to = { 'is_active' : True } )
     actualizable = models.BooleanField( default = True )
-    hoja_de_liquidacion =  models.ForeignKey( HojaLiquidacion, related_name = '+', on_delete = models.PROTECT, blank = True, null = True, default = None )
+    hoja_de_liquidacion =  models.ForeignKey( HojaLiquidacion, related_name = '+', on_delete = models.SET_NULL, blank = True, null = True, default = None )
     class Meta:
         ordering = [ 'fecha', 'no_de_pago' ]
     def __unicode__( self ):
@@ -113,3 +114,25 @@ class Abono( models.Model ):
     def __str__( self ):
         return self.__unicode__()
 
+def movimientos( cliente ):
+    res = {
+        'ventas' : Decimal( 0.0 ),
+        'pagos' : Decimal( 0.0 ),
+        'saldo' : Decimal( 0.0 ),
+        'ultimo_pago' : date( 2000, 1, 1 ),
+        'rec_vta' : Decimal( 0.0 ),
+        'rec_pag' : Decimal( 0.0 )
+    }
+    for vta in Cargo.objects.filter( cliente = cliente ):
+        res[ 'ventas' ] += vta.monto
+        res[ 'saldo' ] += vta.saldo()
+        for pago in Abono.objects.filter( cargo = vta, fecha__gte = res[ 'ultimo_pago' ] ):
+            if res[ 'ultimo_pago' ] < pago.fecha:
+                res[ 'ultimo_pago' ] = pago.fecha
+        if vta.saldo() > 0:
+            res[ 'rec_vta' ] += vta.monto
+            res[ 'rec_pag' ] += ( vta.monto - vta.saldo() )
+    if date( 2000, 1, 1 ) == res[ 'ultimo_pago' ]:
+        res[ 'ultimo_pago' ] = "Sin Pagos"
+    res[ 'pagos' ] = res[ 'ventas' ] - res[ 'saldo' ]
+    return res

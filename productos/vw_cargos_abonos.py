@@ -48,9 +48,7 @@ def index( request ):
                     abono.save()
     my_clients = []
     all_clients = []
-    if usuario.groups.all().filter( name__icontains = 'Administrador' ).exists() \
-            or usuario.groups.all().filter( name__icontains = 'Super-Administrador' ).exists() \
-            or usuario.is_superuser:
+    if usuario.is_admin():
         desc = Usr.objects.all()
     else:
         desc = usuario.descendencia()

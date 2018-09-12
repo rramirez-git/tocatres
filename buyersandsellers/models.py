@@ -8,9 +8,9 @@ class Vendedor( Usr ):
     idvendedor = models.AutoField( primary_key = True )
     reporta_a = models.ForeignKey( 'self', on_delete = models.CASCADE, related_name = '+', blank = True, null = True )
     def __unicode__( self ):
-        return "{} ({})".format( self.get_full_name(), self.usuario )
+        return "{}".format( self.first_name )
     def __str__( self ):
-        return "{} ({})".format( self.get_full_name(), self.usuario )
+        return self.__unicode__()
     def clientes( self ):
         return Cliente.objects.filter( depende_de__pk = self.idusuario ).order_by( 'first_name', 'last_name' )
     def all_clientes( self ):
@@ -49,10 +49,11 @@ class Cliente( Usr ):
     compra_a = models.ForeignKey( Vendedor, on_delete = models.CASCADE, related_name = '+' )
     alias = models.CharField( blank = False, max_length = 100 )
     texto_productos = models.CharField( blank = True, max_length = 250, default = 'Productos que pueden interesarte...' )
+    clave = models.CharField( blank = False, max_length = 15, default = "0000" )
     def __unicode__( self ):
-        return "{} ({})".format( self.get_full_name(), self.usuario )
+        return "{}".format( self.get_full_name() )
     def __str__( self ):
-        return "{} ({})".format( self.get_full_name(), self.usuario )
+        return self.__unicode__()
     def get_from_usr( usr ):
         if Cliente.objects.filter( idusuario = usr.pk ).exists():
             return Cliente.objects.get( idusuario = usr.pk )

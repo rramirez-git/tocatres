@@ -22,9 +22,7 @@ def index( request ):
     if usuario.has_perm_or_has_perm_child( 'vendedor.agregar_vendedores_usuario' ):
         toolbar.append( { 'type' : 'link', 'view' : 'vendedor_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
     data = []
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+    if usuario.is_admin():
         data = Vendedor.get_Vendedores()
     else:
         gerente = Vendedor.get_from_usr( usuario )
@@ -44,9 +42,7 @@ def index( request ):
 def new( request ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     if 'POST' == request.method:
-        if usuario.is_superuser \
-                or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-                or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+        if is_admin():
             frm = RegVendedorInAdmin( request.POST, files = request.FILES )    
         else:
             frm = RegVendedorIn( request.POST, files = request.FILES )
@@ -77,9 +73,7 @@ def new( request ):
                         obj.save()
                         remove( file )
             return HttpResponseRedirect( reverse( 'vendedor_ver', kwargs = { 'pk' : obj.pk } ) )
-    if usuario.is_superuser \
-            or usuario.groups.filter( name = "Administrador" ).exists() \
-            or usuario.groups.filter( name = "Super-Administrador" ).exists():
+    if usuario.is_admin():
         frm = RegVendedorInAdmin( request.POST or None )    
     else:
         frm = RegVendedorIn( request.POST or None )
@@ -141,9 +135,7 @@ def update( request, pk ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     obj = Vendedor.objects.get( pk = pk )
     if 'POST' == request.method:
-        if usuario.is_superuser \
-                or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-                or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+        if usuario.is_admin():
             frm = RegVendedorAdmin( instance = obj, data = request.POST, files = request.FILES )
         else:
             frm = RegVendedor( instance = obj, data = request.POST, files = request.FILES )
@@ -189,9 +181,7 @@ def update( request, pk ):
                 'message' : "Archivo Cargado",
             }
         } )
-    if usuario.is_superuser \
-            or usuario.groups.filter( name__icontains = "Administrador" ).exists() \
-            or usuario.groups.filter( name__icontains = "Super-Administrador" ).exists():
+    if usuario.is_admin():
         frm = RegVendedorAdmin( instance = obj, data = request.POST or None )
     else:
         frm = RegVendedor( instance = obj, data = request.POST or None )
