@@ -97,7 +97,7 @@ urlpatterns = [
 
     path( 'tu-saldo/', vw_cargos_abonos.mi_saldo,   name = 'mi_saldo' ),
 
-    path( 'reportes/saldos/',                               vw_productos_reportes.saldos,                   name = 'reporte_productos_saldos' ),
+    path( 'saldos/',                               vw_productos_reportes.saldos,                   name = 'reporte_productos_saldos' ),
     path( 'reportes/ventas/',                               vw_productos_reportes.ventas,                   name = 'reporte_productos_ventas' ),
     path( 'reportes/pagos/',                                vw_productos_reportes.pagos,                    name = 'reporte_productos_pagos' ),
     path( 'reportes/generar-hoja-de-liquidacion/',          vw_productos_reportes.genHojasLiquidacion,      name = 'reporte_productos_gen_hojliq' ),

@@ -27,7 +27,7 @@ def index( request ):
         'productos/producto/index.html', {
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
-            'titulo' : 'Catálogo',
+            'titulo' : 'Productos',
             'data' : Producto.objects.all(),
             'toolbar' : toolbar
         } )

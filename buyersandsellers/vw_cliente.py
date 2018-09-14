@@ -69,7 +69,6 @@ def index( request ):
     ctes = get_ctes_from_usr( usuario )
     data = []
     for cte in ctes:
-        movs = movimientos( cte )
         data.append( {
             'pk' : cte.pk,
             'usrid' : cte.idusuario,
@@ -80,11 +79,7 @@ def index( request ):
             'email' : cte.email,
             'celular' : cte.celular,
             'telefono' : cte.telefono,
-            'is_active' : cte.is_active,
-            'ventas' : movs[ 'ventas' ],
-            'saldo' : movs[ 'saldo' ],
-            'pagos' : movs[ 'pagos' ],
-            'ult_pag' : movs[ 'ultimo_pago' ]
+            'is_active' : cte.is_active
         } )
     return render(
         request,
@@ -94,8 +89,6 @@ def index( request ):
             'titulo' : 'Clientes',
             'data' : data,
             'toolbar' : toolbar,
-            'products' : Producto.objects.filter( esta_activo = True ),
-            'req_ui' : requires_jquery_ui( request ),
             'mensaje' : mensaje
         } )
     

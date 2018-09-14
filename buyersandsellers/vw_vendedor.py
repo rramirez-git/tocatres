@@ -42,7 +42,7 @@ def index( request ):
 def new( request ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     if 'POST' == request.method:
-        if is_admin():
+        if usuario.is_admin():
             frm = RegVendedorInAdmin( request.POST, files = request.FILES )    
         else:
             frm = RegVendedorIn( request.POST, files = request.FILES )

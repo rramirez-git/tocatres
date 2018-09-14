@@ -11,17 +11,52 @@ from tocatres.utils import requires_jquery_ui, month_name
 
 @valida_acceso( [ 'abono.saldos_abono' ] )
 def saldos( request ):
+    mensaje = None
     show_vendedor = False
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     if usuario.is_admin():
         show_vendedor = True
     actual = 0
-    if "POST" == request.method and "" != request.POST.get( 'idusrvendedor' ):
-        actual = int( "0" + request.POST.get( 'idusrvendedor' ) )
-        usr = Usr.objects.get( pk = actual )
-        ctes = Vendedor.get_from_usr( usr ).clientes()
-    else:
-        ctes = get_ctes_from_usr( usuario )
+    ctes = get_ctes_from_usr( usuario )
+    if "POST" == request.method:
+        if "filter_vend" == request.POST.get( 'action' ):
+            if "" != request.POST.get( 'idusrvendedor' ):
+                actual = int( "0" + request.POST.get( 'idusrvendedor' ) )
+                usr = Usr.objects.get( pk = actual )
+                ctes = Vendedor.get_from_usr( usr ).clientes()
+        elif 'addcharge' == request.POST.get( 'action' ):
+            cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
+            prod = Producto.objects.get( pk = request.POST.get( 'product' ) )
+            Cargo.objects.create(
+                fecha = request.POST.get( 'fecha_cargo' ),
+                factura = request.POST.get( 'factura' ),
+                concepto = request.POST.get( 'concepto_cargo' ),
+                monto = request.POST.get( 'monto_cargo' ),
+                producto = prod,
+                cliente = cte,
+                vendedor = usuario
+            )
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la venta de {} a {}".format( prod, cte ) }
+        elif 'addpayment' == request.POST.get( 'action' ):
+            cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
+            cargo = Cargo.objects.get( pk = request.POST.get( 'cargo' ) )
+            Abono.objects.create(
+                fecha = request.POST.get( 'fecha_abono' ),
+                no_de_pago = request.POST.get( 'no_de_pago' ),
+                concepto = request.POST.get( 'concepto_abono' ),
+                monto = request.POST.get( 'monto_abono' ),
+                cargo = cargo,
+                vendedor = usuario
+            )
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado el pago {} de {} a {}".format( request.POST.get( 'no_de_pago' ), request.POST.get( 'concepto_abono' ), cargo.cliente ) }
+            cargo.actualizable = False
+            if cargo.saldo() <= 0:
+                cargo.saldado = True
+            cargo.save()
+            if cargo.saldado:
+                for abono in Abono.objects.filter( cargo = cargo ):
+                    abono.actualizable = False
+                    abono.save()
     data = []
     totales = { 
         'ventas' : Decimal( 0.0 ), 
@@ -36,14 +71,14 @@ def saldos( request ):
         saldo = Decimal( 0.0 )
         fecha = datetime.date( 2000, 1, 1 )
         for vta in Cargo.objects.filter( cliente = cte ):
-            ventas += vta.monto
-            saldo += vta.saldo()
-            for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha ):
-                if fecha < pago.fecha:
-                    fecha = pago.fecha
             if vta.saldo() > 0:
+                ventas += vta.monto
+                saldo += vta.saldo()
                 rec_vta += vta.monto
                 rec_pag += ( vta.monto - vta.saldo() )
+                for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha ):
+                    if fecha < pago.fecha:
+                        fecha = pago.fecha
         if datetime.date( 2000, 1, 1 ) == fecha:
             fecha = "Sin Pagos"
         pagos = ventas - saldo
@@ -54,6 +89,8 @@ def saldos( request ):
             'idcte'     : cte.pk,
             'idusrcte'  : cte.idusuario,
             'cte'       : "{}".format( cte ),
+            'clave'     : "{}".format( cte.clave ),
+            'wapp'      : cte.celular,
             'idvend'    : cte.compra_a.pk,
             'vend'      : "{}".format( cte.compra_a ),
             'ventas'    : ventas,
@@ -61,18 +98,25 @@ def saldos( request ):
             'saldo'     : saldo,
             'fecha'     : fecha
         } )
-    totales[ 'recuperacion' ] = "{:02.0f}".format( rec_pag * Decimal( 100.0 ) / rec_vta )
+    if rec_vta > 0:
+        totales[ 'recuperacion' ] = "{:02.0f}".format( rec_pag * Decimal( 100.0 ) / rec_vta )
+    decorado = [ ( tmpusr[ 'saldo' ] <= 0, tmpusr[ 'vend' ], tmpusr[ 'cte' ], i, tmpusr ) for i, tmpusr in enumerate( data ) ]
+    decorado.sort()
+    data = [ tmpusr for saldo, vend, cte, i, tmpusr in decorado ]
     return render(
         request,
         'productos/reportes/saldos.html', {
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
-            'titulo' : 'Reporte de Saldos',
+            'titulo' : 'Clientes',
             'data' : data,
             'show_vendedor' : show_vendedor,
             'totales' : totales,
             'encargados' : get_encardados( usuario ),
-            'actual' : actual
+            'actual' : actual,
+            'products' : Producto.objects.filter( esta_activo = True ),
+            'req_ui' : requires_jquery_ui( request ),
+            'mensaje' : mensaje
         } )
 
 @valida_acceso( [ 'abono.ventas_abono' ] )

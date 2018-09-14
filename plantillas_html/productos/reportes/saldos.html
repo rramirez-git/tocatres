@@ -4,13 +4,23 @@
 
 {% block content %}
 
+{% if mensaje %}
+<div class="alert alert-{{ mensaje.type }}" role="alert">
+    {{ mensaje.msg | safe }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endif %}
+
 <form method="post" enctype="application/x-www-form-urlencoded">
     {% csrf_token %}
+    <input type="hidden" name="action" value="filter_vend" />
     <div class="form-row">
         <div class="col form-group">
             <label for="idusrvendedor">Vendedor</label>
             <select class="form-control" id="idusrvendedor" name="idusrvendedor">
-                <option value=""></option>
+                <option value="">TODOS</option>
                 {% if encargados.gerentes %}
                     <optgroup label="Gerentes">
                         {% for item in encargados.gerentes %}
@@ -41,6 +51,7 @@
 <table class="table table-striped table-sm table-responsive-md">
     <thead>
         <tr>
+            <th>Clave</th>
             <th>Cliente</th>
             {% if show_vendedor %}
                 <th>Vendedor</th>
@@ -49,15 +60,16 @@
             <th>Ventas</th>
             <th>Pagos</th>
             <th>Saldo</th>
+            <th colspan="3">Movimientos</th>
+            <th></th>
         </tr>
     </thead>
     <tbody id="data-tbl">
         {% for reg in data %}
             <tr>
+                <td>{{ reg.clave }}</td>
                 <td>
-                    <a href="{% url 'cargos_abonos_edocta' pk=reg.idusrcte %}">
-                        {{ reg.cte }}
-                    </a>
+                    {{ reg.cte }}
                 </td>
                 {% if show_vendedor %}
                     <td>{{ reg.vend }}</td>
@@ -68,6 +80,28 @@
                     <td class="text-right">{{ reg.pagos | intcomma }}</td>
                     <td class="text-right">{{ reg.saldo | intcomma }}</td>
                 {% endlanguage %}
+                <td class="text-center">
+                    <a href="{% url 'cargos_abonos_edocta' pk=reg.idusrcte %}" class="btn btn-outline-secondary" title="Ver Estado de Cuenta">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </a>
+                </td>
+                <td class="text-center">
+                    <button onclick="Prod.showChargeForm( {{ reg.idusrcte }} )" type="button" class="btn btn-outline-secondary" title="Aplicar Venta">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
+                </td>
+                <td class="text-center">
+                    <button onclick="Prod.showPaymentForm( {{ reg.idusrcte }} )" type="button" class="btn btn-outline-secondary" title="Aplicar Pago">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </button>
+                </td>
+                <td class="text-center">
+                    {% if reg.wapp %}
+                    <a class="btn btn-outline-secondary" title="Enviar Mensaje" href="https://api.whatsapp.com/send?phone=52{{ reg.wapp }}" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </tbody>
@@ -84,8 +118,98 @@
                 <th class="text-right">{{ totales.pagos | intcomma }}</th>
                 <th class="text-right">{{ totales.saldo | intcomma }}</th>
             {% endlanguage %}
+            <th colspan="3"></th>
+            <th></th>
         </tr>
     </tfoot>
 </table>
+
+<script type="text/javascript">
+    let productos = [
+        { "pk" : 0, "precio": 0, "nombre" : "" }
+        {% for p in products %}
+            , { "pk" : {{ p.pk }}, "precio" : {{ p.precio_de_venta }}, "nombre": `{{ p | safe }}` }
+        {% endfor %}
+    ];
+    {% if req_ui %}
+        let req_ui = true;
+    {% else %}
+        let req_ui = false;
+    {% endif %}
+</script>
+
+<script type="text/x-handlebars-template" id="aplicar-cargo-template">
+    <form method="post" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% verbatim %}
+        <input type="hidden" name="action" value="addcharge" />
+        <input type="hidden" name="cte" value="{{cte}}" />
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="fecha_cargo">Fecha</label>
+                <input type="date" class="form-control" id="fecha_cargo" name="fecha_cargo" value="{{today}}" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="factura">Factura</label>
+                <input type="text" class="form-control" id="factura" name="factura" value="" maxlength="20" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="product">Producto</label>
+                <select class="form-control" id="product" name="product" onchange="Prod.setChargeInfo()">
+                    {{#each prods}}
+                        <option value="{{pk}}">{{{nombre}}}</option>
+                    {{/each}}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="concepto_cargo">Concepto</label>
+                <input type="text" class="form-control" id="concepto_cargo" name="concepto_cargo" value="" maxlength="150" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="monto_cargo">Monto</label>
+                <input type="text" class="form-control" id="monto_cargo" name="monto_cargo" value="" maxlength="10" required="required" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Aplicar Venta</button>
+        {% endverbatim %}
+    </form>
+</script>
+
+<script type="text/x-handlebars-template" id="aplicar-abono-template">
+    <form method="post" onsubmit="return Prod.verifyPaymentInfo()" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% verbatim %}
+        <input type="hidden" name="action" value="addpayment" />
+        <input type="hidden" name="cte" value="{{cte}}" />
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="fecha_abono">Fecha</label>
+                <input type="date" class="form-control" id="fecha_abono" name="fecha_abono" value="{{today}}" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="no_de_pago">No. de Pago</label>
+                <input type="number" class="form-control" id="no_de_pago" name="no_de_pago" value="" required="required" min="1" max="999" />
+            </div>
+            <div class="col form-group">
+                <label for="cargo">Aplicar al cargo</label>
+                <select onchange="Prod.setPaymentInfo()" class="form-control" id="cargo" name="cargo" required="required"></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="concepto_abono">Concepto</label>
+                <input type="text" class="form-control" id="concepto_abono" name="concepto_abono" value="" maxlength="150" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="monto_abono">Monto</label>
+                <input type="text" class="form-control" id="monto_abono" name="monto_abono" value="" maxlength="10" required="required" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Aplicar Pago</button>
+        {% endverbatim %}
+    </form>
+</script>
 
 {% endblock %}
