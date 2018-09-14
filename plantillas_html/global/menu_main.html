@@ -17,18 +17,26 @@
                             {% if menu_main.wapp_vendedor %}
                                 {% for g in request.user.groups.all %}
                                     {% if 'Cliente' in g.name %}
-                                        <a href="https://wa.me/521{{ menu_main.wapp_vendedor }}" class="nav-link" target="_blank">{{ mp.permiso.mostrar_como }}</a>
+                                        <a href="https://wa.me/521{{ menu_main.wapp_vendedor }}" class="nav-link" target="_blank">
+                                            {{ mp.permiso.mostrar_como }}
+                                        </a>
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
                         {% else %}
-                            <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" class="nav-link">{{ mp.permiso.mostrar_como }}</a>
+                            <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" class="nav-link">
+                                {{ mp.permiso.mostrar_como }}
+                            </a>
                         {% endif %}
                     {% else %}
-                        <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" id="mainMenu-{{ mp.permiso.pk }}" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ mp.permiso }}</a>
+                        <a href="{% if 'vw' == mp.permiso.vista %}#{% else %}{% url mp.permiso.vista %}{% endif %}" id="mainMenu-{{ mp.permiso.pk }}" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ mp.permiso.mostrar_como }}
+                        </a>
                         <div class="dropdown-menu" aria-labelledby="mainMenu-{{ mp.permiso.pk }}">
                             {% for it in mp.items %}
-                                <a href="{% if 'vw' == it.permiso.vista %}#{% else %}{% url it.permiso.vista %}{% endif %}" class="dropdown-item">{{ it.mostrar_como }}</a>
+                                <a href="{% if 'vw' == it.permiso.vista %}#{% else %}{% url it.permiso.vista %}{% endif %}" class="dropdown-item">
+                                    {{ it.mostrar_como }}
+                                </a>
                             {% endfor %}
                         </div>
                     {% endif %}
