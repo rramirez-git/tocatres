@@ -111,16 +111,19 @@ class RegClienteIn( forms.ModelForm ):
             'is_active', 
             'first_name', 
             'last_name', 
+            'apellido_materno',
             'alias',
             'texto_productos',
             'email', 
             'telefono', 
             'celular', 
             'fotografia', 
-            'compra_a' 
+            'compra_a',
+            'fiador',
             ]
         labels = {
-            'email' : 'E-Mail'
+            'email' : 'E-Mail',
+            'last_name' : 'Apellido paterno'
         }
         help_texts = {
             'is_active' : ''
@@ -139,16 +142,19 @@ class RegCliente( forms.ModelForm ):
             'is_active', 
             'first_name', 
             'last_name', 
+            'apellido_materno',
             'alias',
             'texto_productos',
             'email', 
             'telefono', 
             'celular', 
             'fotografia', 
-            'compra_a' 
+            'compra_a',
+            'fiador',
             ]
         labels = {
-            'email' : 'E-Mail'
+            'email' : 'E-Mail',
+            'last_name' : 'Apellido paterno'
         }
         help_texts = {
             'is_active' : ''
@@ -157,3 +163,77 @@ class RegCliente( forms.ModelForm ):
             'telefono' : forms.TextInput( attrs={ 'type' : 'tel' } ),
             'celular' : forms.TextInput( attrs={ 'type' : 'tel' } )
         }
+
+class RegClienteInVend( forms.ModelForm ):
+    class Meta:
+        model = Cliente
+        fields = [ 
+            'usuario', 
+            'contraseña', 
+            'clave',
+            'is_active', 
+            'first_name', 
+            'last_name', 
+            'apellido_materno',
+            'alias',
+            'texto_productos',
+            'email', 
+            'telefono', 
+            'celular', 
+            'fotografia',
+            'fiador'
+            ]
+        labels = {
+            'email' : 'E-Mail',
+            'last_name' : 'Apellido paterno'
+        }
+        help_texts = {
+            'is_active' : ''
+        }
+        widgets = {
+            'telefono' : forms.TextInput( attrs={ 'type' : 'tel' } ),
+            'celular' : forms.TextInput( attrs={ 'type' : 'tel' } )
+        }
+
+class RegClienteVend( forms.ModelForm ):
+    class Meta:
+        model = Cliente
+        fields = [ 
+            'usuario', 
+            'clave',
+            'is_active', 
+            'first_name', 
+            'last_name', 
+            'apellido_materno',
+            'alias',
+            'texto_productos',
+            'email', 
+            'telefono', 
+            'celular', 
+            'fotografia',
+            'fiador'
+            ]
+        labels = {
+            'email' : 'E-Mail',
+            'last_name' : 'Apellido paterno'
+        }
+        help_texts = {
+            'is_active' : ''
+        }
+        widgets = {
+            'telefono' : forms.TextInput( attrs={ 'type' : 'tel' } ),
+            'celular' : forms.TextInput( attrs={ 'type' : 'tel' } )
+        }
+
+class RegDireccion( forms.ModelForm ):
+    class Meta:
+        model = Cliente
+        fields = [
+            'calle',
+            'numero_interior',
+            'numero_exterior',
+            'codigo_postal',
+            'colonia',
+            'municipio',
+            'estado'
+        ]

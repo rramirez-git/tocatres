@@ -1,0 +1,22 @@
+{% extends "buyersandsellers/cliente/form.html" %}
+
+{% block extraafter %}
+
+{% if arbol %}
+    <h3>Árbol de Descendencia</h3>
+    {% for p in arbol %}
+        {{ p.depth_name | safe }}<br />
+    {% endfor %}
+{% endif%}
+
+{% endblock %}
+
+{% block extrabefore %}
+
+{% if fotografia %}
+
+<img src="{{ MEDIA_URL }}{{ fotografia }}" class="rounded-circle float-left" height="150" width="150" />
+
+{% endif %}
+
+{% endblock %}

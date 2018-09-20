@@ -150,6 +150,19 @@ class clsProd {
         } );
         $( "#total" ).html( suma );
     }
+    showChargePaymentFormEdit( idcte, pk, type, fecha, monto, concepto ) {
+        let template = Handlebars.compile( $( "#editar-venta-pago-template").html() );
+        let context = { idcte, pk, type, fecha, monto, concepto };
+        let html = template( context );
+        App.openPanel( html, "Actualizar " + type );
+        if( req_ui ) {
+            $( `input[type="date"]` ).datepicker( {
+                changeMonth: true,
+                changeYear: true,
+                dateFormat : 'yy-mm-dd'  
+            } );
+        }
+    }
 }
 
 let App = new clsApp();

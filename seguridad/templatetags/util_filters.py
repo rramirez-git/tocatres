@@ -24,3 +24,7 @@ def as_paragraph( text ):
 @register.filter
 def random_num( num_ini, num_fin ):
     return "{:3d}".format( randint( num_ini, num_fin ) )
+
+@register.filter
+def money2display( num ):
+    return "{:0,.2f}".format( num )

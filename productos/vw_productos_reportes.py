@@ -71,14 +71,14 @@ def saldos( request ):
         saldo = Decimal( 0.0 )
         fecha = datetime.date( 2000, 1, 1 )
         for vta in Cargo.objects.filter( cliente = cte ):
+            ventas += vta.monto
+            saldo += vta.saldo()
+            for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha ):
+                if fecha < pago.fecha:
+                    fecha = pago.fecha
             if vta.saldo() > 0:
-                ventas += vta.monto
-                saldo += vta.saldo()
                 rec_vta += vta.monto
                 rec_pag += ( vta.monto - vta.saldo() )
-                for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha ):
-                    if fecha < pago.fecha:
-                        fecha = pago.fecha
         if datetime.date( 2000, 1, 1 ) == fecha:
             fecha = "Sin Pagos"
         pagos = ventas - saldo
@@ -90,7 +90,6 @@ def saldos( request ):
             'idusrcte'  : cte.idusuario,
             'cte'       : "{}".format( cte ),
             'clave'     : "{}".format( cte.clave ),
-            'wapp'      : cte.celular,
             'idvend'    : cte.compra_a.pk,
             'vend'      : "{}".format( cte.compra_a ),
             'ventas'    : ventas,

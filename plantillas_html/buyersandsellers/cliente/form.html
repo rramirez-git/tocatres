@@ -1,0 +1,74 @@
+{% extends "global/html_struct.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<form method="post" autocomplete="off" enctype="multipart/form-data" id="main-form" class="d-none" action="{% if action %}{% if request.is_secure %}https{% else %}http{% endif %}://{{ request.get_host }}{% url action %}{% endif %}">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-sm-6">
+            <fieldset>
+                <legend>Datos Generales</legend>
+                {{ frm | crispy }}
+            </fieldset>
+        </div>
+        <div class="col-sm-6">
+            <fieldset>
+                <legend>Dirección</legend>
+                {{ frm2 | crispy }}
+            </fieldset>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-outline-primary" id="btn-save" >Guardar</button>
+</form>
+{% if True == read_only %}
+    <script type="text/javascript">
+        $( document ).ready( () => {
+            $( "#main-form input, #main-form select, #main-form textarea" ).attr( 'readonly', true );
+            $( "#main-form input[type='checkbox'], #main-form input[type='file'], #main-form select" ).attr( 'disabled', true );
+            $( "#main-form input[type='file']" ).parent().parent().hide();
+            $( "#btn-save" ).hide();
+
+            let lbl = null;
+            let val = null;
+
+            if( $( 'input[type="email"][name="email"]' ).length > 0 ) {
+                val = $( 'input[type="email"][name="email"]' ).val();
+                if( "" != val.trim() ) {
+                    lbl = $( 'input[type="email"][name="email"]' ).parent().parent().find( 'label' );
+                    lbl.append( $( `<a href="mailto:${val}" class="btn btn-outline-secondary float-right" target="_blank"><i class="far fa-envelope"></i></a>` ) );
+                }
+            }
+
+            if( $( 'input[type="tel"][name="celular"]' ).length > 0 ) {
+                val = $( 'input[type="tel"][name="celular"]' ).val();
+                if( "" != val.trim() ) {
+                    lbl = $( 'input[type="tel"][name="celular"]' ).parent().parent().find( 'label' );
+                    lbl.append( $( `<a href="https://api.whatsapp.com/send?phone=52${val}" class="btn btn-outline-secondary float-right" target="_blank"><i class="fab fa-whatsapp"></i></a>` ) );
+                }
+            }
+        } )
+    </script>
+{% else %}
+    <script type="text/javascript">
+        let input = $( 'input[type="file"]' );
+        input.parent().append( $( `<button onclick="App.inputFileOpen()" type="button" class="btn btn-outline-secondary" id="btn-save" >Cargar</button>` ) );
+        input.parent().append( $( `<input type="hidden" id="token" name="token" value="{{uploader.token}}" />` ) );
+        let uploader = {
+            url : '{{uploader.url}}',
+            site : '{{uploader.site}}',
+            key : '{{uploader.key}}',
+            onresponse : '{{uploader.onresponse}}',
+            type : '{{uploader.type}}',
+            excecute : '{{uploader.excecute}}',
+            token : '{{uploader.token}}',
+            message : '{{uploader.message}}'
+        }
+        input.remove();
+    </script>
+{% endif %}
+<script type="text/javascript">
+    $( document ).ready( () => {
+        $( "#main-form" ).removeClass( 'd-none' );
+    } )
+</script>
+{% endblock %}
