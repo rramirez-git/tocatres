@@ -77,3 +77,5 @@ class NotasCliente( models.Model ):
     fecha = models.DateField( default = date.today )
     nota = models.TextField()
     cliente = models.ForeignKey( Cliente, on_delete = models.CASCADE, related_name = '+' )
+    class Meta:
+        ordering = [ '-fecha', '-idnota' ]

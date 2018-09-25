@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import Group, User
 from django.db.models import ProtectedError, Q
 from django.conf import settings
 from random import randint
 from os.path import isfile
 from os import remove
+import datetime
+import json
 
 from operator import attrgetter
 
@@ -21,8 +23,15 @@ from .forms import *
 def index( request ):
     mensaje = None
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
+    ctes = get_ctes_from_usr( usuario )
+    actual = 0
     if "POST" == request.method:
-        if "activate_deactivate_clients" == request.POST.get( 'action' ):
+        if "filter_vend" == request.POST.get( 'action' ):
+            if "" != request.POST.get( 'idusrvendedor' ):
+                actual = int( "0" + request.POST.get( 'idusrvendedor' ) )
+                usr = Usr.objects.get( pk = actual )
+                ctes = Vendedor.get_from_usr( usr ).clientes()
+        elif "activate_deactivate_clients" == request.POST.get( 'action' ):
             for prod in Cliente.objects.filter( Q( pk__in = request.POST.getlist( 'cliente_admin_id' ) ) ):
                 prod.is_active = False
                 prod.save()
@@ -63,10 +72,17 @@ def index( request ):
                 for abono in Abono.objects.filter( cargo = cargo ):
                     abono.actualizable = False
                     abono.save()
+        elif 'add-note' == request.POST.get( 'action' ):
+            cte = Cliente.objects.get( pk = request.POST.get( 'idcte' ) )
+            NotasCliente.objects.create( cliente = cte, nota = request.POST.get( 'nota' ) )
+            actual = int( "0" + request.POST.get( 'idusrvendedor' ) )
+            if 0 != actual:
+                usr = Usr.objects.get( pk = actual )
+                ctes = Vendedor.get_from_usr( usr ).clientes()
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la nota a {}".format( cte ) }
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'cliente.agregar_clientes_usuario' ):
         toolbar.append( { 'type' : 'link', 'view' : 'cliente_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
-    ctes = get_ctes_from_usr( usuario )
     data = []
     for cte in ctes:
         data.append( {
@@ -89,7 +105,9 @@ def index( request ):
             'titulo' : 'Clientes',
             'data' : data,
             'toolbar' : toolbar,
-            'mensaje' : mensaje
+            'mensaje' : mensaje,
+            'encargados' : get_encardados( usuario ),
+            'actual' : actual
         } )
     
 @valida_acceso( [ 'cliente.agregar_clientes_usuario' ] )
@@ -278,7 +296,13 @@ def delete( request, pk ):
         return HttpResponseRedirect( reverse( 'cliente_inicio' ) )
     except ProtectedError:
         return HttpResponseRedirect( reverse( 'seguridad_item_con_relaciones' ) )
-    
+
+@valida_acceso()
+def get_notas( request, pk ):
+    cte = Cliente.objects.get( pk = pk )
+    notas = [ { 'fecha' : nota.fecha.strftime( "%d/%m/%Y" ), 'nota' : nota.nota } for nota in NotasCliente.objects.filter( cliente = cte ) ]
+    return HttpResponse( json.dumps( notas ), content_type = 'application/json' )
+
 def get_ctes_from_usr( usuario ):
     data = []
     if usuario.is_admin():
@@ -294,3 +318,19 @@ def get_ctes_from_usr( usuario ):
     decorado.sort()
     data = [ tmpusr for is_active, compra_a, i, tmpusr in decorado ]
     return data
+
+def get_encardados( usr ):
+    usuario = usr
+    if usuario.is_admin():
+        gerentes = Vendedor.get_Gerentes()
+        vendedores = Vendedor.get_Vendedores()
+    elif usuario.depende_de is None and not Vendedor.get_from_usr( usuario ) is None:
+        gerentes = [ Vendedor.get_from_usr( usuario ) ]
+        vendedores = Vendedor.get_Vendedores( gerentes[ 0 ] )
+    elif not Vendedor.get_from_usr( usuario ) is None:
+        gerentes = []
+        vendedores = [ Vendedor.get_from_usr( usuario ) ]
+    else:
+        gerentes = []
+        vendedores = []
+    return { 'gerentes' : gerentes, 'vendedores' : vendedores }

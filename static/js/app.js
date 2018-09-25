@@ -55,11 +55,11 @@ class clsApp {
 }
 
 class clsProd {
-    showChargeForm( idcte ) {
-        let template = Handlebars.compile( $( "#aplicar-cargo-template").html() );
+    showChargeForm( idcte, clave, nombre ) {
+        let template = Handlebars.compile( $( "#aplicar-cargo-template" ).html() );
         let context = { cte : idcte, today : ( new Date() ).asMySQL(), prods : productos };
         let html = template( context );
-        App.openPanel( html, "Aplicar Venta" );
+        App.openPanel( html, `Aplicar Venta ${ clave || nombre ? 'a' : '' } ${ clave ? ( clave + ( nombre ? ' - ' : '' ) ) : '' } ${ nombre ? nombre : '' }` );
         if( req_ui ) {
             $( `input[type="date"]` ).datepicker( {
                 changeMonth: true,
@@ -82,7 +82,7 @@ class clsProd {
             $( "#concepto_cargo" ).attr( 'value', prod.nombre );
         }
     }
-    showPaymentForm( idcte ) {
+    showPaymentForm( idcte, clave, nombre ) {
         $.getJSON( BASE_URL + '/movimientos/ventas/' + idcte + '/', ( movs ) => {
             let cont = 0;
             for( let idx in movs.charges ) {
@@ -98,7 +98,7 @@ class clsProd {
             let template = Handlebars.compile( $( "#aplicar-abono-template").html() );
             let context = { cte : idcte, today : ( new Date() ).asMySQL() };
             let html = template( context );
-            App.openPanel( html, "Aplicar Pago" );
+            App.openPanel( html, `Aplicar Pago ${ clave || nombre ? 'a' : '' } ${ clave ? ( clave + ( nombre ? ' - ' : '' ) ) : '' } ${ nombre ? nombre : '' }` );
             $( "#cargo option" ).remove();
             $( "#concepto_abono" ).attr( 'value', '' );
             $( "#monto_abono" ).attr( 'value', '' );
@@ -165,7 +165,19 @@ class clsProd {
     }
 }
 
+class clsCte {
+    showNotas( idcte, clave, nombre ) {
+        $.getJSON( BASE_URL + '/clientes/notas/' + idcte + '/', ( notas ) => {
+            let template = Handlebars.compile( $( "#notas-cte-template" ).html() );
+            let context = { idcte, idusrvendedor : $( "#idusrvendedor").val(), notas };
+            let html = template( context );
+            App.openPanel( html, `${clave} - ${nombre}` );
+        } );
+    }
+}
+
 let App = new clsApp();
 let Prod = new clsProd();
+let Cte = new clsCte();
 
 $( document ).ready( () => { $('[data-toggle="tooltip"]').tooltip(); } );

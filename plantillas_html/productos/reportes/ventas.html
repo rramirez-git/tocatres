@@ -46,105 +46,24 @@
     </div>
 </form>
 
-{% if req_chart %}
-
-<div class="row">
-    <div class="col-sm-8">
-        <canvas id="grafico_reporte" style="width: 100%; height: 300px;"></canvas>
-    </div>
-    <div class="col-sm-4">
-
-        <table class="table table-striped table-sm table-responsive-md">
-            <thead>
-                <tr>
-                    <th>Mes</th>
-                    <th>Ventas</th>
-                </tr>
-            </thead>
-            <tfoot>
-                <tr>
-                    <th>Total</th>
-                    {% language 'en' %}
-                        <th class="text-right">{{ totales.ventas | intcomma }}</th>
-                    {% endlanguage %}
-                </tr>
-            </tfoot>
-            <tbody>
-                {% for reg in graph_regs %}
-                    {% if reg.value %}
-                    <tr>
-                        <td>{{ reg.key }}</td>
-                        {% language 'en' %}
-                            <td class="text-right">{{ reg.value | intcomma }}</td>
-                        {% endlanguage %}
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-
-    </div>
-</div>
-
-<script type="text/javascript">
-    let dlabels = [];
-    let ddata = [];
-    let dmedia = [];
-    {% for reg in graph_regs %}
-        dlabels.push( '{{ reg.key }}' );
-        ddata.push( {{ reg.value }} );
-        dmedia.push( {{ reg.media }} );
-    {% endfor %}
-    let ctx = $( grafico_reporte )[ 0 ].getContext('2d');
-    let myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: dlabels,
-        datasets: [
-            {
-                lineTension : 0.25,
-                label : 'Ventas',
-                data : ddata
-            },
-            {
-                lineTension : 0.25,
-                label : 'Promedio',
-                data : dmedia,
-                fill : false,
-                borderColor : 'rgba( 40, 167, 69, 0.5 )',
-                backgroundColor : 'rgba( 40, 167, 69, 0.5 )'
-            }
-        ]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
-</script>
-
-{% endif %}
-
 <table class="table table-striped table-sm table-responsive-md">
     <thead>
         <tr>
+            <th>Clave</th>
             <th>Cliente</th>
             {% if show_vendedor %}
                 <th>Vendedor</th>
             {% endif %}
-            <th>Última Venta</th>
-            <th>Ventas</th>
+            <th>Fecha</th>
+            <th>Concepto</th>
+            <th>Precio</th>
         </tr>
     </thead>
     <tbody id="data-tbl">
         {% for reg in data %}
             {% if reg.ventas %}
             <tr>
+                <td>{{ reg.cve }}</td>
                 <td>
                     <a href="{% url 'cargos_abonos_edocta' pk=reg.idusrcte %}">
                         {{ reg.cte }}
@@ -154,6 +73,7 @@
                     <td>{{ reg.vend }}</td>
                 {% endif %}
                 <td>{{ reg.fecha | date:"d/m/Y" }}</td>
+                <td>{{ reg.concepto }}</td>
                 {% language 'en' %}
                     <td class="text-right">{{ reg.ventas | intcomma }}</td>
                 {% endlanguage %}
@@ -164,9 +84,9 @@
     <tfoot>
         <tr>
             {% if show_vendedor %}
-                <th colspan="3">Total</th>
+                <th colspan="5">Total</th>
             {% else %}
-                <th colspan="2">Total</th>
+                <th colspan="4">Total</th>
             {% endif %}
             {% language 'en' %}
                 <th class="text-right">{{ totales.ventas | intcomma }}</th>

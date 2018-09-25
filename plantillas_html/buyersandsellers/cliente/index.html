@@ -15,6 +15,41 @@
 
 <form method="post" enctype="application/x-www-form-urlencoded">
     {% csrf_token %}
+    <input type="hidden" name="action" value="filter_vend" />
+    <div class="form-row">
+        <div class="col form-group">
+            <label for="idusrvendedor">Vendedor</label>
+            <select class="form-control" id="idusrvendedor" name="idusrvendedor">
+                <option value="">Todos</option>
+                {% if encargados.gerentes %}
+                    <optgroup label="Gerentes">
+                        {% for item in encargados.gerentes %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+                {% if encargados.vendedores %}
+                    <optgroup label="Vendedores">
+                        {% for item in encargados.vendedores %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+            </select>
+        </div>
+        <div class="col form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-outline-secondary btn-block"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        </div>
+    </div>
+</form>
+
+<form method="post" enctype="application/x-www-form-urlencoded">
+    {% csrf_token %}
     <input type="hidden" name="action" value="activate_deactivate_clients" />
 
 <table class="table table-striped table-sm table-responsive-md">
@@ -28,6 +63,7 @@
             <th>EMail</th>
             <th>Teléfono</th>
             <th>Activo</th>
+            <th></th>
             <th class="text-right" colspan="3">
                 {% if perms.buyersandsellers.actualizar_clientes_usuario %}
                     <button type="submit" class="btn btn-outline-secondary"><i class="far fa-save"></i> Guardar</button>
@@ -64,6 +100,11 @@
                 <td>
                     <input name="cliente_activo_id" value="{{ reg.pk }}" {% if reg.is_active %}checked="checked"{% endif %} type="checkbox" {% if perms.buyersandsellers.actualizar_clientes_usuario %}{% else %}disabled="disabled"{% endif %} />
                     <input name="cliente_admin_id" value="{{ reg.pk }}" type="hidden" />
+                </td>
+                <td class="text-center">
+                    <button onclick="Cte.showNotas( {{ reg.pk }}, '{{ reg.clave }}', '{{ reg.nombre }}' )" type="button" class="btn btn-outline-secondary" title="Notas">
+                        <i class="far fa-comment-alt"></i>
+                    </button>
                 </td>
                 <td class="text-center">
                     {% if perms.buyersandsellers.clientes_usuario %}
@@ -171,6 +212,32 @@
             </div>
         </div>
         <button type="submit" class="btn btn-outline-primary">Aplicar Pago</button>
+        {% endverbatim %}
+    </form>
+</script>
+
+<script type="text/x-handlebars-template" id="notas-cte-template">
+    <form method="post" enctype="application/x-www-form-urlencoded">
+        {% csrf_token %}
+        {% verbatim %}
+        <input type="hidden" name="action" value="add-note" />
+        <input type="hidden" name="idcte" value="{{idcte}}" />
+        <input type="hidden" name="idusrvendedor" value="{{idusrvendedor}}" />
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="nota">Nueva Nota</label>
+                <textarea class="form-control" id="nota" name="nota"></textarea>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Agregar Nota</button>
+        {{#each notas}}
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <span class="text-muted">{{fecha}}: </span>{{nota}}
+                </div>
+            </div>
+        {{/each}}
         {% endverbatim %}
     </form>
 </script>

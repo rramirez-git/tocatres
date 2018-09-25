@@ -38,6 +38,8 @@ def index( request ):
             prods2 = [ prod for prod in Producto.objects.filter( esta_activo = True ) ]
             shuffle( prods2 )
             productos = productos + prods2[ : 6 ]
+    else:
+        return HttpResponseRedirect( reverse( 'indicadores_inicio' ) )
     vendedor = None
     cte = Cliente.get_from_usr( cte )
     alias = ''

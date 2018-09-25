@@ -57,6 +57,14 @@ def saldos( request ):
                 for abono in Abono.objects.filter( cargo = cargo ):
                     abono.actualizable = False
                     abono.save()
+        elif 'add-note' == request.POST.get( 'action' ):
+            cte = Cliente.objects.get( pk = request.POST.get( 'idcte' ) )
+            NotasCliente.objects.create( cliente = cte, nota = request.POST.get( 'nota' ) )
+            actual = int( "0" + request.POST.get( 'idusrvendedor' ) )
+            if 0 != actual:
+                usr = Usr.objects.get( pk = actual )
+                ctes = Vendedor.get_from_usr( usr ).clientes()
+            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la nota a {}".format( cte ) }
     data = []
     totales = { 
         'ventas' : Decimal( 0.0 ), 
@@ -146,35 +154,20 @@ def ventas( request ):
             ctes = get_ctes_from_usr( usuario )
     else:
         ctes = get_ctes_from_usr( usuario )
-    graph_regs = {}
-    for y in range( \
-            int( "{:04d}{:02d}".format( fecha_inicio.year, fecha_inicio.month ) ), \
-            int( "{:04d}{:02d}".format( fecha_fin.year, fecha_fin.month ) ) + 1 ):
-        if 1 <= y % 100 and y % 100 <= 12:
-            graph_regs[ "{}-{:04.0f}".format( month_name( y % 100 ), y / 100 ) ] = { 
-                'key' : "{}-{:04.0f}".format( month_name( y % 100 ), y / 100 ), 
-                'value' : Decimal( 0.0 ) 
-                }
     for cte in ctes:
-        ventas = Decimal( 0.0 )
-        fecha = datetime.date( 2000, 1, 1 )
         for vta in Cargo.objects.filter( cliente = cte, fecha__gte = fecha_inicio, fecha__lte = fecha_fin ):
-            ventas += vta.monto
-            graph_regs[ "{}-{:04d}".format( month_name( vta.fecha.month ), vta.fecha.year ) ][ 'value' ] += vta.monto
-            if fecha < vta.fecha:
-                fecha = vta.fecha
-        if datetime.date( 2000, 1, 1 ) == fecha:
-            fecha = "Sin Ventas"        
-        totales[ 'ventas' ] += ventas
-        data.append( {
-            'idcte'     : cte.pk,
-            'idusrcte'  : cte.idusuario,
-            'cte'       : "{}".format( cte ),
-            'idvend'    : cte.compra_a.pk,
-            'vend'      : "{}".format( cte.compra_a ),
-            'ventas'    : ventas,
-            'fecha'     : fecha
-        } )
+            data.append( {
+                'idcte'     : cte.pk,
+                'idusrcte'  : cte.idusuario,
+                'cte'       : "{}".format( cte ),
+                'cve'       : cte.clave,
+                'idvend'    : cte.compra_a.pk,
+                'vend'      : "{}".format( cte.compra_a ),
+                'ventas'    : vta.monto,
+                'fecha'     : vta.fecha,
+                'concepto'  : vta.concepto
+            } )
+            totales[ 'ventas' ] += vta.monto
     return render(
         request,
         'productos/reportes/ventas.html', {
@@ -188,9 +181,7 @@ def ventas( request ):
             'req_ui' : requires_jquery_ui( request ),
             'totales' : totales,
             'encargados' : get_encardados( usuario ),
-            'actual' : actual,
-            'req_chart' : True,
-            'graph_regs' : procesa_graph_regs( graph_regs )
+            'actual' : actual
         } )
 
 @valida_acceso( [ 'abono.pagos_abono' ] )
@@ -221,36 +212,21 @@ def pagos( request ):
             ctes = get_ctes_from_usr( usuario )
     else:
         ctes = get_ctes_from_usr( usuario )
-    graph_regs = {}
-    for y in range( \
-            int( "{:04d}{:02d}".format( fecha_inicio.year, fecha_inicio.month ) ), \
-            int( "{:04d}{:02d}".format( fecha_fin.year, fecha_fin.month ) ) + 1 ):
-        if 1 <= y % 100 and y % 100 <= 12:
-            graph_regs[ "{}-{:04.0f}".format( month_name( y % 100 ), y / 100 ) ] = { 
-                'key' : "{}-{:04.0f}".format( month_name( y % 100 ), y / 100 ), 
-                'value' : Decimal( 0.0 ) 
-                }
     for cte in ctes:
-        fecha = datetime.date( 2000, 1, 1 )
-        pagos = Decimal( 0.0 )
         for vta in Cargo.objects.filter( cliente = cte ):
             for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha_inicio, fecha__lte = fecha_fin ):
-                pagos += pago.monto
-                graph_regs[ "{}-{:04d}".format( month_name( pago.fecha.month ), pago.fecha.year ) ][ 'value' ] += pago.monto
-                if fecha < pago.fecha:
-                    fecha = pago.fecha
-        if datetime.date( 2000, 1, 1 ) == fecha:
-            fecha = "Sin Pagos en el Periodo Seleccionado"
-        totales[ 'pagos' ] += pagos
-        data.append( {
-            'idcte'     : cte.pk,
-            'idusrcte'  : cte.idusuario,
-            'cte'       : "{}".format( cte ),
-            'idvend'    : cte.compra_a.pk,
-            'vend'      : "{}".format( cte.compra_a ),
-            'pagos'     : pagos,
-            'fecha'     : fecha
-        } )
+                totales[ 'pagos' ] += pago.monto
+                data.append( {
+                    'idcte'     : cte.pk,
+                    'idusrcte'  : cte.idusuario,
+                    'cte'       : "{}".format( cte ),
+                    'cve'       : cte.clave,
+                    'idvend'    : cte.compra_a.pk,
+                    'vend'      : "{}".format( cte.compra_a ),
+                    'pagos'     : pago.monto,
+                    'fecha'     : pago.fecha,
+                    'concepto'  : pago.concepto
+                } )
     return render(
         request,
         'productos/reportes/pagos.html', {
@@ -265,8 +241,6 @@ def pagos( request ):
             'totales' : totales,
             'encargados' : get_encardados( usuario ),
             'actual' : actual,
-            'req_chart' : True,
-            'graph_regs' : procesa_graph_regs( graph_regs )
         } )
 
 @valida_acceso( [ 'hojaliquidacion.genhojaliquidacion_hoja liquidacion' ] )

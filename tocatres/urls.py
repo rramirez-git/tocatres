@@ -22,7 +22,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from seguridad import views
 from seguridad import vw_permiso, vw_perfil, vw_usuario
 from autenticacion import vw_perms, vw_users
-from buyersandsellers import vw_cliente, vw_vendedor, vw_gerente
+from buyersandsellers import vw_cliente, vw_vendedor, vw_gerente, vw_indicadores_vendedor
 from productos import vw_producto, vw_campania, vw_cargos_abonos, vw_productos_reportes
 
 urlpatterns = [
@@ -54,6 +54,8 @@ urlpatterns = [
     path( 'usuarios/',                  vw_usuario.index,   name = "usuario_inicio" ),
     path( 'users/',                     vw_users.index,     name = "users_inicio" ),
 
+    path( 'indicadores/',   vw_indicadores_vendedor.index, name = "indicadores_inicio" ),
+
     path( 'gerentes/actualizar/<pk>/',  vw_gerente.update,  name = 'gerente_actualizar' ),
     path( 'gerentes/eliminar/<pk>/',    vw_gerente.delete,  name = 'gerente_eliminar' ),
     path( 'gerentes/nuevo/',            vw_gerente.new,     name = 'gerente_nuevo' ),
@@ -66,11 +68,12 @@ urlpatterns = [
     path( 'vendedores/<pk>/',               vw_vendedor.see,    name = 'vendedor_ver' ),
     path( 'vendedores/',                    vw_vendedor.index,  name = 'vendedor_inicio' ),
 
-    path( 'clientes/actualizar/<pk>/',  vw_cliente.update,  name = 'cliente_actualizar' ),
-    path( 'clientes/eliminar/<pk>/',    vw_cliente.delete,  name = 'cliente_eliminar' ),
-    path( 'clientes/nuevo/',            vw_cliente.new,     name = 'cliente_nuevo' ),
-    path( 'clientes/<pk>/',             vw_cliente.see,     name = 'cliente_ver' ),
-    path( 'clientes/',                  vw_cliente.index,   name = 'cliente_inicio' ),
+    path( 'clientes/actualizar/<pk>/',  vw_cliente.update,      name = 'cliente_actualizar' ),
+    path( 'clientes/eliminar/<pk>/',    vw_cliente.delete,      name = 'cliente_eliminar' ),
+    path( 'clientes/notas/<pk>/',       vw_cliente.get_notas,   name = 'cliente_get_notas' ),
+    path( 'clientes/nuevo/',            vw_cliente.new,         name = 'cliente_nuevo' ),
+    path( 'clientes/<pk>/',             vw_cliente.see,         name = 'cliente_ver' ),
+    path( 'clientes/',                  vw_cliente.index,       name = 'cliente_inicio' ),
 
     path( 'productos/actualizar/<pk>/', vw_producto.update, name = 'producto_actualizar' ),
     path( 'productos/eliminar/<pk>/',   vw_producto.delete, name = 'producto_eliminar' ),
@@ -97,7 +100,7 @@ urlpatterns = [
 
     path( 'tu-saldo/', vw_cargos_abonos.mi_saldo,   name = 'mi_saldo' ),
 
-    path( 'saldos/',                               vw_productos_reportes.saldos,                   name = 'reporte_productos_saldos' ),
+    path( 'saldos/',                                        vw_productos_reportes.saldos,                   name = 'reporte_productos_saldos' ),
     path( 'reportes/ventas/',                               vw_productos_reportes.ventas,                   name = 'reporte_productos_ventas' ),
     path( 'reportes/pagos/',                                vw_productos_reportes.pagos,                    name = 'reporte_productos_pagos' ),
     path( 'reportes/generar-hoja-de-liquidacion/',          vw_productos_reportes.genHojasLiquidacion,      name = 'reporte_productos_gen_hojliq' ),

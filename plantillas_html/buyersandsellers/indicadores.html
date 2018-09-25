@@ -1,0 +1,119 @@
+{% extends "global/html_struct.html" %}
+
+{% block content %}
+
+<form method="post" enctype="application/x-www-form-urlencoded">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="col form-group">
+            <label for="fecha_inicio">Fecha Inicial:</label>
+            <input type="date" class="form-control" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio | date:'Y-m-d' }}" />
+        </div>
+        <div class="col form-group">
+            <label for="fecha_fin">Fecha Final:</label>
+            <input type="date" class="form-control" name="fecha_fin" id="fecha_fin" value="{{ fecha_fin | date:'Y-m-d' }}" />
+        </div>
+        <div class="col form-group">
+            <label for="idusrvendedor">Vendedor</label>
+            <select class="form-control" id="idusrvendedor" name="idusrvendedor">
+                <option value="">Todos</option>
+                {% if encargados.gerentes %}
+                    <optgroup label="Gerentes">
+                        {% for item in encargados.gerentes %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+                {% if encargados.vendedores %}
+                    <optgroup label="Vendedores">
+                        {% for item in encargados.vendedores %}
+                            <option value="{{ item.idusuario }}" {% if actual == item.idusuario %}selected="selected"{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor%}
+                    </optgroup>
+                {% endif %}
+            </select>
+        </div>
+        <div class="col form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-outline-secondary btn-block"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        </div>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col">
+        <canvas id="grafico_reporte" style="width: 100%; height: 300px;"></canvas>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let dlabels = [];
+    let ddata_vta = [];
+    let dmedia_vta = [];
+    let ddata_pago = [];
+    let dmedia_pago = [];
+    {% for reg in graph_regs_vta %}
+        dlabels.push( '{{ reg.key }}' );
+        ddata_vta.push( {{ reg.value }} );
+        dmedia_vta.push( {{ reg.media }} );
+    {% endfor %}
+    {% for reg in graph_regs_pago %}
+        ddata_pago.push( {{ reg.value }} );
+        dmedia_pago.push( {{ reg.media }} );
+    {% endfor %}
+    let ctx = $( grafico_reporte )[ 0 ].getContext('2d');
+    let myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dlabels,
+            datasets: [
+                {
+                    lineTension : 0.25,
+                    label : 'Ventas',
+                    data : ddata_vta,
+                    fill : true,
+                    borderColor : 'rgba( 40, 167, 69, 0.5 )',
+                    backgroundColor : 'rgba( 40, 167, 69, 0.20 )'
+                },
+                {
+                    lineTension : 0.25,
+                    label : 'Promedio Ventas',
+                    data : dmedia_vta,
+                    fill : false,
+                    borderColor : 'rgba( 40, 167, 69, 1 )',
+                    backgroundColor : 'rgba( 40, 167, 69, 1 )'
+                },
+                {
+                    lineTension : 0.25,
+                    label : 'Pagos',
+                    data : ddata_pago,
+                    fill : true,
+                    borderColor : 'rgba( 0, 123, 255, 0.5 )',
+                    backgroundColor : 'rgba( 0, 123, 255, 0.20 )'
+                },
+                {
+                    lineTension : 0.25,
+                    label : 'Promedio Pagos',
+                    data : dmedia_pago,
+                    fill : false,
+                    borderColor : 'rgba( 0, 123, 255, 1 )',
+                    backgroundColor : 'rgba( 0, 123, 255, 1 )'
+                }
+            ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+{% endblock %}
