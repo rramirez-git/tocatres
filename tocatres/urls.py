@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from seguridad import views
-from seguridad import vw_permiso, vw_perfil, vw_usuario
+from seguridad import vw_permiso, vw_perfil, vw_usuario, vw_settings
 from autenticacion import vw_perms, vw_users
 from buyersandsellers import vw_cliente, vw_vendedor, vw_gerente, vw_indicadores_vendedor
 from productos import vw_producto, vw_campania, vw_cargos_abonos, vw_productos_reportes
@@ -53,6 +53,10 @@ urlpatterns = [
     path( 'usuarios/<pk>/',             vw_usuario.see,     name = "usuario_ver" ),
     path( 'usuarios/',                  vw_usuario.index,   name = "usuario_inicio" ),
     path( 'users/',                     vw_users.index,     name = "users_inicio" ),
+
+    path( 'settings/configurar/<pk>/',  vw_settings.setvalue,   name = 'settings_configurar' ),
+    path( 'settings/actualizar/<pk>/',  vw_settings.update,     name = 'settings_actualizar' ),
+    path( 'settings/',                  vw_settings.index,      name = 'settings_inicio' ),
 
     path( 'indicadores/',   vw_indicadores_vendedor.index, name = "indicadores_inicio" ),
 

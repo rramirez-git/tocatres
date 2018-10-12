@@ -15,7 +15,8 @@ def index( request ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     actual = 0
     today = datetime.date.today()
-    fecha_inicio = datetime.date( today.year - 1, today.month, 1 )
+    #fecha_inicio = datetime.date( today.year - 1, today.month, 1 )
+    fecha_inicio = datetime.date( 2013, 1, 1 )
     if 2 == today.month:
         fecha_fin = datetime.date( today.year, today.month, 28 )
     elif today.month in [ 4, 6, 9, 11 ]:

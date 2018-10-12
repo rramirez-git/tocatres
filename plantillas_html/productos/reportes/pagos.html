@@ -56,7 +56,9 @@
             {% endif %}
             <th>Fecha</th>
             <th>Concepto</th>
-            <th>Monto</th>
+            <th>Subtotal</th>
+            <th>I.V.A.</th>
+            <th>Pago</th>
         </tr>
     </thead>
     <tbody id="data-tbl">
@@ -75,6 +77,8 @@
                 <td>{{ reg.fecha | date:"d/m/Y" }}</td>
                 <td>{{ reg.concepto }}</td>
                 {% language 'en' %}
+                    <td class="text-right">{{ reg.subtotal | intcomma }}</td>
+                    <td class="text-right">{{ reg.iva | intcomma }}</td>
                     <td class="text-right">{{ reg.pagos | intcomma }}</td>
                 {% endlanguage %}
             </tr>
@@ -89,6 +93,8 @@
                 <th colspan="4">Total</th>
             {% endif %}
             {% language 'en' %}
+            <th class="text-right">{{ totales.subtotal | intcomma }}</th>
+            <th class="text-right">{{ totales.iva | intcomma }}</th>
                 <th class="text-right">{{ totales.pagos | intcomma }}</th>
             {% endlanguage %}
         </tr>

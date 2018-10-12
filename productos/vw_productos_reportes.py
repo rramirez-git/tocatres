@@ -27,7 +27,7 @@ def saldos( request ):
         elif 'addcharge' == request.POST.get( 'action' ):
             cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
             prod = Producto.objects.get( pk = request.POST.get( 'product' ) )
-            Cargo.objects.create(
+            mov = Cargo.objects.create(
                 fecha = request.POST.get( 'fecha_cargo' ),
                 factura = request.POST.get( 'factura' ),
                 concepto = request.POST.get( 'concepto_cargo' ),
@@ -36,11 +36,15 @@ def saldos( request ):
                 cliente = cte,
                 vendedor = usuario
             )
+            mov.porcentaje_de_iva = Decimal( mov.producto.porcentaje_de_iva )
+            mov.subtotal = Decimal( mov.monto ) / ( ( 100 + mov.porcentaje_de_iva ) / 100 )
+            mov.iva = Decimal( mov.monto ) - mov.subtotal
+            mov.save()
             mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la venta de {} a {}".format( prod, cte ) }
         elif 'addpayment' == request.POST.get( 'action' ):
             cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
             cargo = Cargo.objects.get( pk = request.POST.get( 'cargo' ) )
-            Abono.objects.create(
+            mov = Abono.objects.create(
                 fecha = request.POST.get( 'fecha_abono' ),
                 no_de_pago = request.POST.get( 'no_de_pago' ),
                 concepto = request.POST.get( 'concepto_abono' ),
@@ -48,6 +52,9 @@ def saldos( request ):
                 cargo = cargo,
                 vendedor = usuario
             )
+            mov.subtotal = Decimal(  mov.monto ) / ( ( 100 + mov.cargo.porcentaje_de_iva ) / 100 )
+            mov.iva = Decimal( mov.monto ) - mov.subtotal
+            mov.save()
             mensaje = { 'type' : 'success', 'msg' : "Se ha agregado el pago {} de {} a {}".format( request.POST.get( 'no_de_pago' ), request.POST.get( 'concepto_abono' ), cargo.cliente ) }
             cargo.actualizable = False
             if cargo.saldo() <= 0:
@@ -121,7 +128,7 @@ def saldos( request ):
             'totales' : totales,
             'encargados' : get_encardados( usuario ),
             'actual' : actual,
-            'products' : Producto.objects.filter( esta_activo = True ),
+            'products' : Producto.objects.all(),
             'req_ui' : requires_jquery_ui( request ),
             'mensaje' : mensaje
         } )
@@ -134,7 +141,7 @@ def ventas( request ):
         show_vendedor = True
     actual = 0
     data = []
-    totales = { 'ventas' : Decimal( 0.0 ) }
+    totales = { 'ventas' : Decimal( 0.0 ), 'subtotal' : Decimal( 0.0 ), 'iva' : Decimal( 0.0 ) }
     today = datetime.date.today()
     fecha_inicio = datetime.date( today.year - 1, today.month, 1 )
     if 2 == today.month:
@@ -164,10 +171,15 @@ def ventas( request ):
                 'idvend'    : cte.compra_a.pk,
                 'vend'      : "{}".format( cte.compra_a ),
                 'ventas'    : vta.monto,
+                'subtotal'  : vta.subtotal,
+                'iva'       : vta.iva,
                 'fecha'     : vta.fecha,
-                'concepto'  : vta.concepto
+                'concepto'  : vta.concepto,
+                'factura'   : vta.factura
             } )
             totales[ 'ventas' ] += vta.monto
+            totales[ 'subtotal' ] += vta.subtotal
+            totales[ 'iva' ] += vta.iva
     return render(
         request,
         'productos/reportes/ventas.html', {
@@ -192,7 +204,7 @@ def pagos( request ):
         show_vendedor = True
     actual = 0
     data = []
-    totales = { 'pagos' : Decimal( 0.0 ) }
+    totales = { 'pagos' : Decimal( 0.0 ), 'subtotal' : Decimal( 0.0 ), 'iva' : Decimal( 0.0 ) }
     today = datetime.date.today()
     fecha_inicio = datetime.date( today.year - 1, today.month, 1 )
     if 2 == today.month:
@@ -216,6 +228,8 @@ def pagos( request ):
         for vta in Cargo.objects.filter( cliente = cte ):
             for pago in Abono.objects.filter( cargo = vta, fecha__gte = fecha_inicio, fecha__lte = fecha_fin ):
                 totales[ 'pagos' ] += pago.monto
+                totales[ 'subtotal' ] += pago.subtotal
+                totales[ 'iva' ] += pago.iva
                 data.append( {
                     'idcte'     : cte.pk,
                     'idusrcte'  : cte.idusuario,
@@ -224,6 +238,8 @@ def pagos( request ):
                     'idvend'    : cte.compra_a.pk,
                     'vend'      : "{}".format( cte.compra_a ),
                     'pagos'     : pago.monto,
+                    'subtotal'  : pago.subtotal,
+                    'iva'       : pago.iva,
                     'fecha'     : pago.fecha,
                     'concepto'  : pago.concepto
                 } )
@@ -364,21 +380,35 @@ def detalleHojaLiquidación( request, pk ):
     usuario = Usr.objects.filter( id = request.user.pk )[ 0 ]
     obj = HojaLiquidacion.objects.get( pk = pk )
     if "POST" == request.method:
-        if "" != request.POST.get( 'fecha_banco' ):
-            obj.fecha_banco = request.POST.get( 'fecha_banco' )
-        if "" != request.POST.get( 'banco' ):
+        if "set-data" == request.POST.get( 'action' ):
+            if "" != request.POST.get( 'fecha_banco' ):
+                obj.fecha_banco = datetime.datetime.strptime( request.POST.get( 'fecha_banco' ), '%Y-%m-%d').date()
+            if "" != request.POST.get( 'banco' ):
+                obj.banco = request.POST.get( 'banco' )
+            if "" != request.POST.get( 'referencia' ):
+                obj.referencia = request.POST.get( 'referencia' )
+            if "" != request.POST.get( 'no_autorizacion' ):
+                obj.no_autorizacion = request.POST.get( 'no_autorizacion' )
+        elif "update" == request.POST.get( 'action' ):
+            obj.fecha_entrega = datetime.datetime.strptime( request.POST.get( 'fecha_entrega' ), '%Y-%m-%d').date()
+            obj.fecha_banco = datetime.datetime.strptime( request.POST.get( 'fecha_banco' ) , '%Y-%m-%d').date()
             obj.banco = request.POST.get( 'banco' )
-        if "" != request.POST.get( 'referencia' ):
             obj.referencia = request.POST.get( 'referencia' )
-        if "" != request.POST.get( 'no_autorizacion' ):
             obj.no_autorizacion = request.POST.get( 'no_autorizacion' )
+            for pago in request.POST.getlist( 'removerpago' ):
+                p = Abono.objects.get( pk = pago )
+                p.hoja_de_liquidacion = None
+                p.save()
         obj.save()
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'hojaliquidacion.hojaliquidacion_hoja liquidacion' ):
         toolbar.append( { 'type' : 'link', 'view' : 'reporte_productos_hojliq', 'label' : '<i class="fas fa-list-ul"></i> Ver Todas' } )
     pagos = Abono.objects.filter( hoja_de_liquidacion = obj )
+    can_update = usuario.has_perm_or_has_perm_child( 'hojaliquidacion.actualizar_hoja_de_liquidacion_hoja liquidacion' )
     can_edit = usuario.has_perm_or_has_perm_child( 'hojaliquidacion.agregar_fecha_de_deposito_bancario_hoja liquidacion' )
     can_edit = ( can_edit and ( obj.fecha_banco is None or obj.banco is None or obj.referencia is None or obj.no_autorizacion is None ) )
+    if can_update and not can_edit:
+        toolbar.append( { 'type' : 'button', 'onclick' : 'HojaLiq.openForUpdate()', 'label' : '<i class="far fa-edit"></i> Actualizar' } )
     suma = Decimal( 0.0 )
     for p in pagos:
         suma += p.monto
@@ -392,6 +422,7 @@ def detalleHojaLiquidación( request, pk ):
             'hl' : obj,
             'pagos' : pagos,
             'can_edit' : can_edit,
+            'can_update' : can_update,
             'req_ui' : requires_jquery_ui( request ),
             'total' : suma,
             'toolbar' : toolbar

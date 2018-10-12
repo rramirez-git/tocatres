@@ -126,3 +126,27 @@ class Usr( User ):
         return self.is_superuser \
             or self.groups.filter( name__icontains = "Administrador" ).exists() \
             or self.groups.filter( name__icontains = "Super-Administrador" ).exists()
+
+class Setting( models.Model ):
+    ENTERO = 'INTEGER'
+    CADENA = 'STRING'
+    TEXTO_LARGO = 'TEXT'
+    IMAGEN = 'PICTURE'
+    TIPOS_SETTING = (
+        ( ENTERO, 'Entero' ),
+        ( CADENA, 'Cadena' ),
+        ( TEXTO_LARGO, 'Texto Largo' ),
+        ( IMAGEN, 'Imagen' ),
+    )
+    idsetting = models.AutoField( primary_key = True )
+    seccion = models.CharField( blank = False, max_length = 100 )
+    nombre = models.CharField( blank = False, max_length = 100 )
+    nombre_para_mostrar = models.CharField( blank = False, max_length = 100 )
+    valor = models.TextField()
+    tipo = models.CharField( blank = False, max_length = 20, choices = TIPOS_SETTING, default = CADENA )
+    def __unicode__( self ):
+        return self.nombre_para_mostrar
+    def __str__( self ):
+        return self.__unicode__
+    class Meta:
+        ordering = [ 'seccion', 'nombre_para_mostrar' ]

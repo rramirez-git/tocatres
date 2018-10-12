@@ -55,7 +55,10 @@
                 <th>Vendedor</th>
             {% endif %}
             <th>Fecha</th>
+            <th>Factura</th>
             <th>Concepto</th>
+            <th>Subtotal</th>
+            <th>I.V.A.</th>
             <th>Precio</th>
         </tr>
     </thead>
@@ -73,8 +76,11 @@
                     <td>{{ reg.vend }}</td>
                 {% endif %}
                 <td>{{ reg.fecha | date:"d/m/Y" }}</td>
+                <td>{{ reg.factura }}</td>
                 <td>{{ reg.concepto }}</td>
                 {% language 'en' %}
+                    <td class="text-right">{{ reg.subtotal | intcomma }}</td>
+                    <td class="text-right">{{ reg.iva | intcomma }}</td>
                     <td class="text-right">{{ reg.ventas | intcomma }}</td>
                 {% endlanguage %}
             </tr>
@@ -84,11 +90,13 @@
     <tfoot>
         <tr>
             {% if show_vendedor %}
-                <th colspan="5">Total</th>
+                <th colspan="6">Total</th>
             {% else %}
-                <th colspan="4">Total</th>
+                <th colspan="5">Total</th>
             {% endif %}
             {% language 'en' %}
+                <th class="text-right">{{ totales.subtotal | intcomma }}</th>
+                <th class="text-right">{{ totales.iva | intcomma }}</th>
                 <th class="text-right">{{ totales.ventas | intcomma }}</th>
             {% endlanguage %}
         </tr>

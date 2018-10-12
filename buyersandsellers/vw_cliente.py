@@ -39,39 +39,6 @@ def index( request ):
                 prod.is_active = True
                 prod.save()
             mensaje = { 'type' : 'success', 'msg' : "Clientes actualizados" }
-        elif 'addcharge' == request.POST.get( 'action' ):
-            cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
-            prod = Producto.objects.get( pk = request.POST.get( 'product' ) )
-            Cargo.objects.create(
-                fecha = request.POST.get( 'fecha_cargo' ),
-                factura = request.POST.get( 'factura' ),
-                concepto = request.POST.get( 'concepto_cargo' ),
-                monto = request.POST.get( 'monto_cargo' ),
-                producto = prod,
-                cliente = cte,
-                vendedor = usuario
-            )
-            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la venta de {} a {}".format( prod, cte ) }
-        elif 'addpayment' == request.POST.get( 'action' ):
-            cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
-            cargo = Cargo.objects.get( pk = request.POST.get( 'cargo' ) )
-            Abono.objects.create(
-                fecha = request.POST.get( 'fecha_abono' ),
-                no_de_pago = request.POST.get( 'no_de_pago' ),
-                concepto = request.POST.get( 'concepto_abono' ),
-                monto = request.POST.get( 'monto_abono' ),
-                cargo = cargo,
-                vendedor = usuario
-            )
-            mensaje = { 'type' : 'success', 'msg' : "Se ha agregado el pago {} de {} a {}".format( request.POST.get( 'no_de_pago' ), request.POST.get( 'concepto_abono' ), cargo.cliente ) }
-            cargo.actualizable = False
-            if cargo.saldo() <= 0:
-                cargo.saldado = True
-            cargo.save()
-            if cargo.saldado:
-                for abono in Abono.objects.filter( cargo = cargo ):
-                    abono.actualizable = False
-                    abono.save()
         elif 'add-note' == request.POST.get( 'action' ):
             cte = Cliente.objects.get( pk = request.POST.get( 'idcte' ) )
             NotasCliente.objects.create( cliente = cte, nota = request.POST.get( 'nota' ) )

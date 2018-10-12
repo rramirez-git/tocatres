@@ -111,8 +111,9 @@
             {% include "global/footer.html" %}
 		{% endif %}
 
-		{% if req_ui %}
-			<script type="text/javascript">
+		
+		<script type="text/javascript">
+			{% if req_ui %}
 				$.datepicker.setDefaults( $.datepicker.regional[ "es" ] );
 				$( document ).ready( () => {
 					$( `input[type="date"]` ).datepicker( {
@@ -121,8 +122,12 @@
 						dateFormat : 'yy-mm-dd'  
 					} );
 				} );
-			</script>
-		{% endif %}
+
+				let req_ui = true;
+			{% else %}
+				let req_ui = false;
+			{% endif %}
+		</script>
 
     </body>
 </html>

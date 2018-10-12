@@ -38,12 +38,12 @@
                     {% if mov.es_venta %}
                         {% if perms.productos.actualizar_venta_cargo %}
                             {% if mov.actualizable %}
-                                <button onclick="Prod.showChargePaymentFormEdit( {{ cte.pk }}, {{ mov.pk }}, 'venta', '{{ mov.fecha | date:"Y-m-d" }}', {{ mov.monto }}, '{{ mov.concepto }}' )" class="btn btn-outline-secondary" title="Actualizar">
+                                <button onclick="Prod.showChargePaymentFormEdit( {{ cte.pk }}, {{ mov.pk }}, 'venta', '{{ mov.fecha | date:"Y-m-d" }}', {{ mov.monto }}, '{{ mov.concepto }}', '{{ mov.referencia }}' )" class="btn btn-outline-secondary" title="Actualizar">
                                     <i class="far fa-edit"></i>
                                 </button>
                             {% else %}
                                 {% if usr_is_admin %}
-                                    <button onclick="Prod.showChargePaymentFormEdit( {{ cte.pk }}, {{ mov.pk }}, 'venta', '{{ mov.fecha | date:"Y-m-d" }}', {{ mov.monto }}, '{{ mov.concepto }}' )" class="btn btn-outline-secondary" title="Actualizar">
+                                    <button onclick="Prod.showChargePaymentFormEdit( {{ cte.pk }}, {{ mov.pk }}, 'venta', '{{ mov.fecha | date:"Y-m-d" }}', {{ mov.monto }}, '{{ mov.concepto }}', '{{ mov.referencia }}' )" class="btn btn-outline-secondary" title="Actualizar">
                                         <i class="far fa-edit"></i>
                                     </button>
                                 {% endif %}
@@ -101,7 +101,40 @@
     </tbody>
 </table>
 
-<script type="text/x-handlebars-template" id="editar-venta-pago-template">
+<script type="text/x-handlebars-template" id="editar-venta-template">
+    <form method="post" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% verbatim %}
+        <input type="hidden" name="idcte" value="{{idcte}}" />
+        <input type="hidden" name="pk" value="{{pk}}" />
+        <input type="hidden" name="type" value="{{type}}" />
+        <input type="hidden" name="action" value="edit-mov" />
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="fecha">Fecha</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" value="{{fecha}}" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="monto">Monto</label>
+                <input type="text" class="form-control" id="monto" name="monto" value="{{monto}}" required="required" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col form-group">
+                <label for="factura">Factura</label>
+                <input type="text" class="form-control" id="factura" name="factura" value="{{factura}}" required="required" />
+            </div>
+            <div class="col form-group">
+                <label for="concepto">Concepto</label>
+                <input type="text" class="form-control" id="concepto" name="concepto" value="{{concepto}}" required="required" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Actualizar</button>
+        {% endverbatim %}
+    </form>
+</script>
+
+<script type="text/x-handlebars-template" id="editar-pago-template">
     <form method="post" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         {% verbatim %}
@@ -128,14 +161,6 @@
         <button type="submit" class="btn btn-outline-primary">Actualizar</button>
         {% endverbatim %}
     </form>
-</script>
-
-<script type="text/javascript">
-    {% if req_ui %}
-        let req_ui = true;
-    {% else %}
-        let req_ui = false;
-    {% endif %}
 </script>
 
 {% endblock %}

@@ -72,3 +72,13 @@ class AccUsuario( forms.Form ):
         password = self.cleaned_data.get( 'pwd' )
         user = auth.authenticate( username = username, password = password )
         return user
+
+class RegSetting( forms.ModelForm ):
+    class Meta:
+        model = Setting
+        fields = [
+            'seccion',
+            'nombre',
+            'nombre_para_mostrar',
+            'tipo'
+        ]

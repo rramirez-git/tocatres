@@ -14,6 +14,7 @@ class RegProductoCPrecio( forms.ModelForm ):
             'categoria',
             'precio_de_compra',
             'precio_de_venta',
+            'porcentaje_de_iva',
             'descripcion'
         ]
         labels = {

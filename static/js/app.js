@@ -150,9 +150,11 @@ class clsProd {
         } );
         $( "#total" ).html( suma );
     }
-    showChargePaymentFormEdit( idcte, pk, type, fecha, monto, concepto ) {
-        let template = Handlebars.compile( $( "#editar-venta-pago-template").html() );
-        let context = { idcte, pk, type, fecha, monto, concepto };
+    showChargePaymentFormEdit( idcte, pk, type, fecha, monto, concepto, factura ="" ) {
+        let template = ( "venta" == type ? 
+            Handlebars.compile( $( "#editar-venta-template").html() ) : 
+            Handlebars.compile( $( "#editar-pago-template").html() ) );
+        let context = { idcte, pk, type, fecha, monto, concepto, factura };
         let html = template( context );
         App.openPanel( html, "Actualizar " + type );
         if( req_ui ) {
@@ -176,8 +178,28 @@ class clsCte {
     }
 }
 
+class clsHojaLiq {
+    openForUpdate() {
+        $( "#data-form .d-none" ).removeClass( 'd-none' );
+        $( "#data-form" ).append( $( '<button class="btn btn-outline-secondary" type="submit"><i class="far fa-save"></i> Guardar</button>' ) );
+        $( "#action" ).attr( 'value', 'update' );
+        $( "#fecha_entrega, #banco, #fecha_banco, #referencia, #no_autorizacion" ).each( function(){
+            $( this ).removeAttr( 'readonly' );
+            $( this ).removeAttr( 'disabled' );
+        } );
+        if( req_ui ) {
+            $( `input[type="date"]` ).datepicker( {
+                changeMonth: true,
+                changeYear: true,
+                dateFormat : 'yy-mm-dd'  
+            } );
+        }
+    }
+}
+
 let App = new clsApp();
 let Prod = new clsProd();
 let Cte = new clsCte();
+let HojaLiq = new clsHojaLiq();
 
 $( document ).ready( () => { $('[data-toggle="tooltip"]').tooltip(); } );

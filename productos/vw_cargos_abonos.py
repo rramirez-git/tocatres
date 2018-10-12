@@ -17,7 +17,7 @@ def index( request ):
         cte = Usr.objects.get( pk = request.POST.get( 'cte' ) )
         if 'addcharge' == request.POST.get( 'action' ):
             prod = Producto.objects.get( pk = request.POST.get( 'product' ) )
-            Cargo.objects.create(
+            mov = Cargo.objects.create(
                 fecha = request.POST.get( 'fecha_cargo' ),
                 factura = request.POST.get( 'factura' ),
                 concepto = request.POST.get( 'concepto_cargo' ),
@@ -26,10 +26,14 @@ def index( request ):
                 cliente = cte,
                 vendedor = usuario
             )
+            mov.porcentaje_de_iva = decimal.Decimal( mov.producto.porcentaje_de_iva )
+            mov.subtotal = decimal.Decimal( mov.monto ) / ( ( 100 + mov.porcentaje_de_iva ) / 100 )
+            mov.iva = decimal.Decimal( mov.monto ) - mov.subtotal
+            mov.save()
             mensaje = { 'type' : 'success', 'msg' : "Se ha agregado la venta de {} a {}".format( prod, cte ) }
         elif 'addpayment' == request.POST.get( 'action' ):
             cargo = Cargo.objects.get( pk = request.POST.get( 'cargo' ) )
-            Abono.objects.create(
+            mov = Abono.objects.create(
                 fecha = request.POST.get( 'fecha_abono' ),
                 no_de_pago = request.POST.get( 'no_de_pago' ),
                 concepto = request.POST.get( 'concepto_abono' ),
@@ -37,6 +41,9 @@ def index( request ):
                 cargo = cargo,
                 vendedor = usuario
             )
+            mov.subtotal = decimal.Decimal( mov.monto ) / ( ( 100 + mov.cargo.porcentaje_de_iva ) / 100 )
+            mov.iva = decimal.Decimal( mov.monto ) - mov.subtotal
+            mov.save()
             mensaje = { 'type' : 'success', 'msg' : "Se ha agregado el pago {} de {} a {}".format( request.POST.get( 'no_de_pago' ), request.POST.get( 'concepto_abono' ), cargo.cliente ) }
             cargo.actualizable = False
             if cargo.saldo() <= 0:
@@ -66,7 +73,7 @@ def index( request ):
             'titulo' : 'Movimientos',
             'my_clients' : sorted( my_clients, key = attrgetter( 'first_name', 'last_name' ) ),
             'all_clients' : sorted( all_clients, key = attrgetter( 'first_name', 'last_name' ) ),
-            'products' : Producto.objects.filter( esta_activo = True ),
+            'products' : Producto.objects.all(),
             'req_ui' : requires_jquery_ui( request ),
             'mensaje' : mensaje
     } )
@@ -85,6 +92,9 @@ def account( request, pk ):
                     mov.fecha = request.POST.get( 'fecha' )
                     mov.monto = request.POST.get( 'monto' )
                     mov.concepto = request.POST.get( 'concepto' )
+                    mov.factura = request.POST.get( 'factura' )
+                    mov.subtotal = decimal.Decimal( mov.monto ) / ( ( 100 + mov.porcentaje_de_iva ) / 100 )
+                    mov.iva = decimal.Decimal( mov.monto ) - mov.subtotal
                     mov.save()
                     if mov.saldo() <= 0:
                         mov.saldado = True
@@ -102,6 +112,8 @@ def account( request, pk ):
                     mov.fecha = request.POST.get( 'fecha' )
                     mov.monto = request.POST.get( 'monto' )
                     mov.concepto = request.POST.get( 'concepto' )
+                    mov.subtotal = decimal.Decimal( mov.monto ) / ( ( 100 + mov.cargo.porcentaje_de_iva ) / 100 )
+                    mov.iva =decimal.Decimal( mov.monto ) - mov.subtotal
                     mov.save()
                     if mov.cargo.saldo() <= 0:
                         mov.cargo.saldado = True

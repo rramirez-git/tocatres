@@ -127,11 +127,6 @@
             , { "pk" : {{ p.pk }}, "precio" : {{ p.precio_de_venta }}, "nombre": `{{ p | safe }}` }
         {% endfor %}
     ];
-    {% if req_ui %}
-        let req_ui = true;
-    {% else %}
-        let req_ui = false;
-    {% endif %}
 </script>
 
 <script type="text/x-handlebars-template" id="aplicar-cargo-template">

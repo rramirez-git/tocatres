@@ -17,8 +17,8 @@ class Vendedor( Usr ):
     def all_clientes( self ):
         ctes = list( self.clientes() )
         for vend in Vendedor.get_Vendedores( self ):
-            for cte in vend.clientes():
-                ctes.append( cte )
+            tmp = [ cte for cte in vend.clientes() ]
+            ctes = ctes + tmp
         return ctes
     def get_from_usr( usr ):
         if Vendedor.objects.filter( idusuario = usr.pk ).exists():

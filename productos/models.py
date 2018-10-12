@@ -19,8 +19,10 @@ class Producto( models.Model ):
     precio_de_compra = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     precio_de_venta = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     descripcion = models.TextField()
+    porcentaje_de_iva = models.DecimalField( max_digits = 4, decimal_places = 2, default = 16.0 )
     class Meta:
-        ordering = [ '-esta_activo', 'sku', 'categoria', 'marca', 'modelo', 'nombre' ]
+        #ordering = [ '-esta_activo', 'sku', 'categoria', 'marca', 'modelo', 'nombre' ]
+        ordering = [ 'nombre', 'marca', 'modelo' ]
     def __unicode__( self ):
         name = ""
         if self.nombre:
@@ -65,6 +67,9 @@ class Cargo( models.Model ):
     vendedor = models.ForeignKey( Usr, related_name = '+', on_delete = models.SET_NULL, null = True, limit_choices_to = { 'is_active' : True } )
     actualizable = models.BooleanField( default = True )
     saldado = models.BooleanField( default = False )
+    porcentaje_de_iva = models.DecimalField( max_digits = 4, decimal_places = 2, default = 16.0 )
+    iva = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
+    subtotal = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     class Meta:
         ordering = [ 'cliente', 'fecha', 'factura' ]
     def __unicode__( self ):
@@ -72,7 +77,7 @@ class Cargo( models.Model ):
     def __str__( self ):
         return self.__unicode__()
     def saldo( self ):
-        saldo = self.monto
+        saldo = Decimal( self.monto )
         abonos = Abono.objects.filter( cargo = self )
         for abono in abonos:
             saldo -= abono.monto
@@ -95,7 +100,7 @@ class HojaLiquidacion( models.Model ):
     def __unicode__( self ):
         return "{}".format( self.identificador )
     def __str__( self ):
-        return self.__unicode__
+        return self.__unicode__()
 
 class Abono( models.Model ):
     idabono = models.AutoField( primary_key = True )
@@ -107,6 +112,8 @@ class Abono( models.Model ):
     vendedor = models.ForeignKey( Usr, related_name = '+', on_delete = models.SET_NULL, null = True, limit_choices_to = { 'is_active' : True } )
     actualizable = models.BooleanField( default = True )
     hoja_de_liquidacion =  models.ForeignKey( HojaLiquidacion, related_name = '+', on_delete = models.SET_NULL, blank = True, null = True, default = None )
+    iva = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
+    subtotal = models.DecimalField( max_digits = 9, decimal_places = 2, default = 0.0 )
     class Meta:
         ordering = [ 'fecha', 'no_de_pago' ]
     def __unicode__( self ):

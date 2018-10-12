@@ -22,13 +22,14 @@ def index( request ):
     toolbar = []
     if usuario.has_perm_or_has_perm_child( 'producto.agregar_productos_producto' ):
         toolbar.append( { 'type' : 'link', 'view' : 'producto_nuevo', 'label' : '<i class="far fa-file"></i> Nuevo' } )
+    prods = Producto.objects.all().order_by( '-esta_activo', 'nombre', 'marca', 'modelo' )
     return render(
         request,
         'productos/producto/index.html', {
             'menu_main' : usuario.main_menu_struct(),
             'footer' : True,
             'titulo' : 'Productos',
-            'data' : Producto.objects.all(),
+            'data' : prods,
             'toolbar' : toolbar
         } )
 
